@@ -1,0 +1,38 @@
+version: 1
+workspace:
+  id: 29432a8da297495bb150ba6fa80d47da
+  name: nitro-pipelines
+commands:
+  - name: setup
+    description: Create an environment
+    steps:
+      - cwd: .
+        scripts: 
+          - python3 -m venv env
+          - source env/bin/activate
+  - name: clean
+    description: Create an environment
+    steps:
+      - cwd: .
+        scripts: 
+          - rm -rf ./env
+  - name: test-build
+    description: test
+    steps:
+      - cwd: .
+        scripts: 
+          - export NITRO_PIPELINES_MICROSERVICES_PATH=./test/microservices.yml && ./bitbucket/pipe/nitro-pipe build groups-microservice
+  - name: test-deploy
+    description: test
+    steps:
+      - cwd: .
+        scripts: 
+          - export ENV=DEV && export NITRO_PIPELINES_MICROSERVICES_PATH=./test/microservices.yml && ./bitbucket/pipe/nitro-pipe deploy
+  - name: build
+    description: Build the docker image
+    steps: 
+      - script: docker build -t nitroagility/nitro-bitbucket-pipelines:29 -f ./bitbucket/Dockerfile .
+  - name: push
+    description: Build the docker image
+    steps:
+      - script: docker push nitroagility/nitro-bitbucket-pipelines:29

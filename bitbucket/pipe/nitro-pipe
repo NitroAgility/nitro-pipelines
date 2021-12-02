@@ -1,0 +1,29 @@
+#!/bin/bash
+if [ -z "$1" ]; then
+    echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
+    exit
+fi
+cwd=$(dirname "$0")
+python3 $cwd/microservices-gen.py $1 $2
+if [ $1 = "build" ]; then
+    if [ -z "$2" ]; then
+        echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
+        exit
+    else
+        echo $2
+        declare script_name="./nitro-$2-build.sh"
+        if test -f $script_name; then
+            $script_name
+        else
+            script_name = dx
+            echo "File $script_name doesn't exists."
+        fi
+    fi
+else
+    script_name="./nitro-microservices-deploy.sh"
+    if test -f $script_name; then
+        $script_name
+    else
+        echo "File $script_name doesn't exists."
+    fi
+fi

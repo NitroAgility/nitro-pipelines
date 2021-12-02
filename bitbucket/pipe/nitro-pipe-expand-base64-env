@@ -1,0 +1,2 @@
+#!/bin/bash
+echo $1 | base64 --decode >> $2.tmp && envsubst < ./$2.tmp > ./$2.env

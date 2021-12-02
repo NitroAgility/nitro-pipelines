@@ -1,0 +1,22 @@
+# applicative microservices
+microservices:
+  - name: contoflow-protocols-webapp
+    dockerfile: ./microservices/contoflow_protocols/webapp/Dockerfile
+build:
+  expand:
+    - variable: PIPE_BUILD_ENV_FILE
+      type: environment
+deployments:
+  default:
+    expand:
+      - variable: 'PIPE_DEV_PLATFORM_ENV_FILE'
+        name: platform
+        type: file
+      - variable:  'PIPE_DEV_PROTOCOLS_ENV_FILE'
+        name: protocols
+        type: file
+    scripts:
+      pre_execution: ls -la && echo $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
+      post_execution: ls -la && echo $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
+    helm:
+      parameters: --set env.platform="$(base64 -w 0 ./platform.env)" --set env.protocols="$(base64 -w 0 ./protocols.env)"
