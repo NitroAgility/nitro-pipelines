@@ -10,11 +10,13 @@ class Microservice(BaseModel):
 
 class ExpandItem(BaseModel):
     variable: str
+    name: Optional[str] = None
     type: str
 
 
 class Build(BaseModel):
     expand: List[ExpandItem]
+    registry: str
 
 
 class ExpandItem1(BaseModel):
@@ -34,13 +36,14 @@ class Helm(BaseModel):
 
 class Default(BaseModel):
     expand: Optional[List[ExpandItem1]]
+    registry: str
     scripts: Optional[Scripts]
     helm: Optional[Helm]
 
 
 class Deployments(BaseModel):
     default: Default
-
+    
 
 class Model(BaseModel):
     microservices: List[Microservice]
@@ -66,11 +69,25 @@ docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:latest
 docker tag @registry@:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:$NITRO_PIPELINES_BUILD_NUMBER
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:$NITRO_PIPELINES_BUILD_NUMBER"""
 
-deploy_template="""@pre_execution@
+deploy_pre_promote_template="""
+docker pull $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER
+docker tag $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
+"""
 
+deploy_post_promote_template="""
+docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
+docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:latest
+"""
+
+deploy_template="""@pre_execution@
+aws configure set aws_access_key_id $NITRO_PIPELINES_SOURCE_AWS_ACCESS_KEY
+aws configure set aws_secret_access_key $NITRO_PIPELINES_SOURCE_AWS_SECRET_ACCESS
+aws ecr get-login-password --region $NITRO_PIPELINES_SOURCE_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY
+@pre_promotion@
 aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
+@post_promotion@
 aws eks --region $NITRO_PIPELINES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_TARGET_AWS_EKS_CLUSTER_NAME
 helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_NAMESPACE "$NITRO_PIPELINES_TARGET_HELM_CHART_SOURCE/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain=$NITRO_PIPELINES_DOMAIN --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
 @post_execution@"""
@@ -118,6 +135,8 @@ def create_file(expanded_create: str, expanded_destroy:str, template: str, scrip
     build_script_content = build_script_content.replace('@env@', (os.getenv('ENV', '')).lower())
     script_file = f'./nitro-{script_name}-{script_type}.sh'
     build_script_file = open(script_file, "w")
+    build_script_content = [line for line in build_script_content.split('\n') if line.strip() != ""]
+    build_script_content = '\n'.join(build_script_content)
     n = build_script_file.write(build_script_content)
     build_script_file.close()
     st = os.stat(script_file)
@@ -127,6 +146,7 @@ def create_file(expanded_create: str, expanded_destroy:str, template: str, scrip
 with open(path) as file:
     yaml_obj = yaml.load(file, Loader=yaml.FullLoader)
     model = Model(**yaml_obj)
+    # Generate scripts
     if arg_operation == 'any' or arg_operation == 'build':
         for microservice in model.microservices:
             ms_name = microservice.name
@@ -137,7 +157,7 @@ with open(path) as file:
                 expanded_create = '\n'.join(expand_create_content(model.build.expand))
                 expanded_destroy = '\n'.join(expand_destroy_content(model.build.expand))
                 substitutions = []
-                substitutions.append(('@registry@', ms_name))
+                substitutions.append(('@registry@', model.build.registry.replace('@name@', ms_name)))
                 substitutions.append(('@dockerfile@', ms_dockerfile))
                 create_file(expanded_create, expanded_destroy, build_template, 'build', ms_name, substitutions)
     if arg_operation == 'any' or arg_operation == 'deploy':
@@ -153,6 +173,19 @@ with open(path) as file:
                 pre_execution = model.deployments.default.scripts.pre_execution
             if model.deployments.default.scripts.post_execution is not None:
                 post_execution = model.deployments.default.scripts.post_execution
+        pre_promotions = []
+        post_promotions = []
+        if model.deployments is not None and model.deployments.default is not None and model.deployments.default.registry is not None:
+            for microservice in model.microservices:
+                ms_name = microservice.name
+                if os.getenv('ENV_SOURCE', '') == '' or os.getenv('ENV_SOURCE', '').upper() == 'BUILD':
+                    registry_source = model.build.registry.replace('@name@', ms_name).replace('@promotion-env@', '${ENV_SOURCE}')
+                else:
+                    registry_source = model.deployments.default.registry.replace('@name@', ms_name).replace('@promotion-env@', '${ENV_SOURCE}')
+                registry_target = model.deployments.default.registry.replace('@name@', ms_name).replace('@promotion-env@', '${ENV_TARGET}')
+                pre_promotions.append(deploy_pre_promote_template.replace('@registry_source@', registry_source).replace('@registry_target@', registry_target))
+                post_promotions.append(deploy_post_promote_template.replace('@registry_source@', registry_source).replace('@registry_target@', registry_target))
+        template = template.replace('@pre_promotion@', '\n'.join(pre_promotions)).replace('@post_promotion@', '\n'.join(post_promotions))
         template = template.replace('@pre_execution@', pre_execution).replace('@post_execution@', post_execution)
         if model.deployments.default.helm is not None and model.deployments.default.helm.parameters is not None:
             template = template.replace('@helm_parameters@', model.deployments.default.helm.parameters)

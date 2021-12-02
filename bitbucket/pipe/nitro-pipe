@@ -15,7 +15,7 @@ if [ $1 = "build" ]; then
         if test -f $script_name; then
             $script_name
         else
-            script_name = dx
+            $script_name = dx
             echo "File $script_name doesn't exists."
         fi
     fi
