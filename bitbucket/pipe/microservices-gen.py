@@ -74,8 +74,8 @@ docker tag @registry@:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:$NITRO_PIPELINES_BUILD_NUMBER"""
 
 deploy_pre_promote_template="""
-docker pull $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER
-docker tag $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
+docker pull $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER
+docker tag $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
 """
 
 deploy_post_promote_template="""
@@ -94,7 +94,7 @@ aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker 
 @post_promotion@
 aws eks --region $NITRO_PIPELINES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_TARGET_AWS_EKS_CLUSTER_NAME
 @pre_deployment@
-helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_SOURCE/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain=$NITRO_PIPELINES_DOMAIN --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
+helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain="$NITRO_PIPELINES_DOMAIN" --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
 @post_deployment@
 @post_execution@"""
 

@@ -1,6 +1,6 @@
 version: 1
 workspace:
-  id: 29440a8da297495bb150ba6fa80d47da
+  id: 29444a8da297495bb150ba6fa80d47da
   name: nitro-pipelines
 commands:
   - name: setup
@@ -31,8 +31,8 @@ commands:
   - name: build
     description: Build the docker image
     steps: 
-      - script: docker build -t nitroagility/nitro-bitbucket-pipelines:40 -f ./bitbucket/Dockerfile .
+      - script: docker build -t nitroagility/nitro-bitbucket-pipelines:44 -f ./bitbucket/Dockerfile .
   - name: push
     description: Build the docker image
     steps:
-      - script: docker push nitroagility/nitro-bitbucket-pipelines:40
+      - script: docker push nitroagility/nitro-bitbucket-pipelines:44

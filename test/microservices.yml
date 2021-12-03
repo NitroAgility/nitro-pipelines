@@ -10,19 +10,19 @@ build:
 deployments:
   default:
     expand:
-      - variable: PIPE_DEV_ENV_FILE
+      - variable: PIPE_${ENV}_ENV_FILE
         type: environment
-      - variable: 'PIPE_DEV_PLATFORM_ENV_FILE'
+      - variable: 'PIPE_${ENV}_PLATFORM_ENV_FILE'
         name: platform
         type: file
         file_name: protocols
-      - variable:  'PIPE_DEV_PROTOCOLS_ENV_FILE'
+      - variable:  'PIPE_${ENV}_PROTOCOLS_ENV_FILE'
         name: protocols
         type: file
     registry: '@promotion-env@-@name@'
     scripts:
       pre_execution: ''
-      pre_deployment: ' ls -la .'
+      pre_deployment: 'source ./database/scripts/deployment.sh'
       post_deployment: ''
       post_execution:  ''
     helm:
