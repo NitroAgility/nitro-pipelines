@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y unzip \
     curl \
     gettext-base \
     python3.9 \
-    python3-pip
+    python3-pip \
+    python3.8-venv
 
 # Install Dependencies
 RUN pip install -r /requirements.txt && rm /requirements.txt

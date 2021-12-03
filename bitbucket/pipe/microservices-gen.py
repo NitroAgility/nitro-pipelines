@@ -1,4 +1,4 @@
-import os, sys, stat, yaml
+import uuid, os, sys, stat, yaml
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -28,6 +28,8 @@ class ExpandItem1(BaseModel):
 class Scripts(BaseModel):
     pre_execution: Optional[str] = None
     post_execution: Optional[str] = None
+    pre_deployment: Optional[str] = None
+    post_deployment: Optional[str] = None
 
 
 class Helm(BaseModel):
@@ -50,6 +52,8 @@ class Model(BaseModel):
     build: Build
     deployments: Optional[Deployments]
 
+
+execution_context_id = uuid.uuid4().hex
 
 path = os.getenv('NITRO_PIPELINES_MICROSERVICES_PATH', './microservices.ym')
 
@@ -89,7 +93,9 @@ aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCES
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 @post_promotion@
 aws eks --region $NITRO_PIPELINES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_TARGET_AWS_EKS_CLUSTER_NAME
-helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_NAMESPACE "$NITRO_PIPELINES_TARGET_HELM_CHART_SOURCE/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain=$NITRO_PIPELINES_DOMAIN --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
+@pre_deployment@
+helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_SOURCE/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain=$NITRO_PIPELINES_DOMAIN --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
+@post_deployment@
 @post_execution@"""
 
 
@@ -111,6 +117,7 @@ def expand_create_content(model):
         expanded_name = expand.variable
         expanded_name = expanded_name.replace('${ENV}', os.getenv('ENV', ''))
         file_name = expand.name if expand.name is not None else 'variables'
+        file_name = f'{file_name}-{execution_context_id}'
         expanded.append(expand_variable_template_create.replace('@env_var_name@', expanded_name).replace('@file_name@', file_name))
         if expand.type is not None and expand.type.lower() == 'environment':
             expanded.append(load_file_template.replace('@env_var_name@', expanded_name).replace('@file_name@', file_name))
@@ -123,6 +130,7 @@ def expand_destroy_content(model):
         expanded_name = expand.variable
         expanded_name = expanded_name.replace('${ENV}', os.getenv('ENV', ''))
         file_name = expand.name if expand.name is not None else 'variables'
+        file_name = f'{file_name}-{execution_context_id}'
         expanded.append(expand_variable_template_destroy.replace('@env_var_name@', expanded_name).replace('@file_name@', file_name))
     return expanded
 
@@ -168,11 +176,18 @@ with open(path) as file:
         template = deploy_template
         pre_execution = ''
         post_execution = ''
+        pre_deployment = ''
+        post_deployment = ''
         if model.deployments.default.scripts is not None:
             if model.deployments.default.scripts.pre_execution is not None:
                 pre_execution = model.deployments.default.scripts.pre_execution
             if model.deployments.default.scripts.post_execution is not None:
                 post_execution = model.deployments.default.scripts.post_execution
+                
+            if model.deployments.default.scripts.pre_deployment is not None:
+                pre_deployment = model.deployments.default.scripts.pre_deployment
+            if model.deployments.default.scripts.post_deployment is not None:
+                post_deployment = model.deployments.default.scripts.post_deployment
         pre_promotions = []
         post_promotions = []
         if model.deployments is not None and model.deployments.default is not None and model.deployments.default.registry is not None:
@@ -186,6 +201,7 @@ with open(path) as file:
                 pre_promotions.append(deploy_pre_promote_template.replace('@registry_source@', registry_source).replace('@registry_target@', registry_target))
                 post_promotions.append(deploy_post_promote_template.replace('@registry_source@', registry_source).replace('@registry_target@', registry_target))
         template = template.replace('@pre_promotion@', '\n'.join(pre_promotions)).replace('@post_promotion@', '\n'.join(post_promotions))
+        template = template.replace('@pre_deployment@', pre_deployment).replace('@post_deployment@', post_deployment)
         template = template.replace('@pre_execution@', pre_execution).replace('@post_execution@', post_execution)
         if model.deployments.default.helm is not None and model.deployments.default.helm.parameters is not None:
             template = template.replace('@helm_parameters@', model.deployments.default.helm.parameters)

@@ -1,9 +1,7 @@
 # applicative microservices
 microservices:
-  - name: groups-microservice
-    dockerfile: ./microservices/groups_microservice/Dockerfile
-  - name: users-microservice
-    dockerfile: ./microservices/groups_microservice/Dockerfile
+  - name: contoflow-protocols-webapp
+    dockerfile: ./microservices/contoflow_protocols/webapp/Dockerfile
 build:
   expand:
     - variable: PIPE_BUILD_ENV_FILE
@@ -12,18 +10,20 @@ build:
 deployments:
   default:
     expand:
-      - variable: PIPE_${ENV}_ENV_FILE
+      - variable: PIPE_DEV_ENV_FILE
         type: environment
-      - variable: 'PIPE_${ENV}_PLATFORM_ENV_FILE'
+      - variable: 'PIPE_DEV_PLATFORM_ENV_FILE'
         name: platform
         type: file
         file_name: protocols
-      - variable:  'PIPE_${ENV}_PROTOCOLS_ENV_FILE'
+      - variable:  'PIPE_DEV_PROTOCOLS_ENV_FILE'
         name: protocols
         type: file
-    registry: '@name@-@promotion-env@'
+    registry: '@promotion-env@-@name@'
     scripts:
-      pre_execution: 'echo "Pipeline is about to start..."'
-      post_execution:  'echo "Pipeline completed..."'
+      pre_execution: ''
+      pre_deployment: ' ls -la .'
+      post_deployment: ''
+      post_execution:  ''
     helm:
       parameters: --set env.platform="$(base64 -w 0 ./platform.env)" --set env.protocols="$(base64 -w 0 ./protocols.env)"
