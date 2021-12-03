@@ -114,10 +114,14 @@ else:
 def expand_create_content(model):
     expanded = []
     for expand in model:
+        is_random = False
+        if expand.type is not None and expand.type.lower() == 'environment':
+            is_random = True
         expanded_name = expand.variable
         expanded_name = expanded_name.replace('${ENV}', os.getenv('ENV', ''))
         file_name = expand.name if expand.name is not None else 'variables'
-        file_name = f'{file_name}-{execution_context_id}'
+        if is_random == True:
+            file_name = f'{file_name}-{execution_context_id}'
         expanded.append(expand_variable_template_create.replace('@env_var_name@', expanded_name).replace('@file_name@', file_name))
         if expand.type is not None and expand.type.lower() == 'environment':
             expanded.append(load_file_template.replace('@env_var_name@', expanded_name).replace('@file_name@', file_name))
@@ -127,10 +131,13 @@ def expand_create_content(model):
 def expand_destroy_content(model):
     expanded = []
     for expand in model:
+        if expand.type is not None and expand.type.lower() == 'environment':
+            is_random = True
         expanded_name = expand.variable
         expanded_name = expanded_name.replace('${ENV}', os.getenv('ENV', ''))
         file_name = expand.name if expand.name is not None else 'variables'
-        file_name = f'{file_name}-{execution_context_id}'
+        if is_random == True:
+            file_name = f'{file_name}-{execution_context_id}'
         expanded.append(expand_variable_template_destroy.replace('@env_var_name@', expanded_name).replace('@file_name@', file_name))
     return expanded
 

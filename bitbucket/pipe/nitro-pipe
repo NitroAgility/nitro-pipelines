@@ -13,7 +13,7 @@ if [ $1 = "build" ]; then
         echo $2
         declare script_name="./nitro-$2-build.sh"
         if test -f $script_name; then
-            $script_name
+            source $script_name
         else
             $script_name = dx
             echo "File $script_name doesn't exists."
@@ -22,7 +22,7 @@ if [ $1 = "build" ]; then
 else
     script_name="./nitro-microservices-deploy.sh"
     if test -f $script_name; then
-        $script_name
+        source $script_name
     else
         echo "File $script_name doesn't exists."
     fi
