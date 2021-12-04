@@ -67,6 +67,7 @@ load_file_template='''source ./@file_name@.env && export $(cut -d= -f1 ./@file_n
 build_template="""aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
+aws ecr create-repository --repository-name @registry@ --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
 docker build -t @registry@:latest --build-arg JFROG_USERNAME=$NITRO_PIPELINES_FROG_USERNAME --build-arg JFROG_PASSWORD=$NITRO_PIPELINES_JFROG_PASSWORD -f @dockerfile@ .
 docker tag @registry@:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:latest
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:latest
@@ -75,6 +76,7 @@ docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:$NITRO_PIPELINES_
 
 deploy_pre_promote_template="""
 docker pull $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER
+aws ecr create-repository --repository-name @registry_target@ --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
 docker tag $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
 """
 
