@@ -76,11 +76,11 @@ docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:$NITRO_PIPELINES_
 
 deploy_pre_promote_template="""
 docker pull $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER
-aws ecr create-repository --repository-name @registry_target@ --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
-docker tag $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
 """
 
 deploy_post_promote_template="""
+aws ecr create-repository --repository-name @registry_target@ --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
+docker tag $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/@registry_source@:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:$NITRO_PIPELINES_BUILD_NUMBER
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry_target@:latest
 """

@@ -18,6 +18,7 @@ RUN chmod +x /nitro-pipe && chmod +x /nitro-pipe-expand-base64-env
 RUN apt-get update && apt install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa 
 RUN apt-get update && apt-get install -y unzip \
     curl \
+    uuid-runtime \
     gettext-base \
     python3.9 \
     python3-pip \
