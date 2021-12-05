@@ -6,10 +6,11 @@ source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
 rm -f ./$filename.env
 if [ -z "$1" ]; then
     echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
-    exit
+    exit 1
 fi
 cwd=$(dirname "$0")
 python3 $cwd/microservices-gen.py $1 $2
+if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
         echo "No required arguments supplied (operation=any|build|deploy, ms_name)."

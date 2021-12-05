@@ -153,8 +153,14 @@ def create_file(expanded_create: str, expanded_destroy:str, template: str, scrip
     script_file = f'./nitro-{script_name}-{script_type}.sh'
     build_script_file = open(script_file, "w")
     build_script_content = [line for line in build_script_content.split('\n') if line.strip() != ""]
-    build_script_content = '\n'.join(build_script_content)
-    n = build_script_file.write(build_script_content)
+    script_lines = []
+    exit_check='if [[ $? -ne 0 ]]; then exit 1;fi'
+    for line in build_script_content:
+        script_lines.append(line)
+        if line != '#!/bin/bash':
+            script_lines.append(exit_check)
+    script_lines = '\n'.join(script_lines)
+    n = build_script_file.write(script_lines)
     build_script_file.close()
     st = os.stat(script_file)
     os.chmod(script_file, st.st_mode | stat.S_IEXEC)
@@ -192,7 +198,6 @@ with open(path) as file:
                 pre_execution = model.deployments.default.scripts.pre_execution
             if model.deployments.default.scripts.post_execution is not None:
                 post_execution = model.deployments.default.scripts.post_execution
-                
             if model.deployments.default.scripts.pre_deployment is not None:
                 pre_deployment = model.deployments.default.scripts.pre_deployment
             if model.deployments.default.scripts.post_deployment is not None:
