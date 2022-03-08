@@ -1,3 +1,4 @@
+from statistics import mode
 import uuid, os, sys, stat, yaml
 from typing import List, Optional
 from pydantic import BaseModel
@@ -15,6 +16,7 @@ class ExpandItem(BaseModel):
 
 
 class Build(BaseModel):
+    build_args: Optional[str] = None
     expand: List[ExpandItem]
     registry: str
 
@@ -26,6 +28,7 @@ class ExpandItem1(BaseModel):
 
 
 class Scripts(BaseModel):
+    pre_execution: Optional[str] = None
     pre_execution: Optional[str] = None
     post_execution: Optional[str] = None
     pre_deployment: Optional[str] = None
@@ -68,7 +71,7 @@ build_template="""aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AW
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 aws ecr create-repository --repository-name @registry@ --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
-docker build -t @registry@:latest --build-arg REGISTRY_USERNAME=$NITRO_PIPELINES_FROG_USERNAME --build-arg REGISTRY_PASSWORD=$NITRO_PIPELINES_REGISTRY_PASSWORD -f @dockerfile@ .
+docker build -t @registry@:latest @docker_args@ -f @dockerfile@ .
 docker tag @registry@:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:latest
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:latest
 docker tag @registry@:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/@registry@:$NITRO_PIPELINES_BUILD_NUMBER
@@ -183,7 +186,8 @@ with open(path) as file:
                 substitutions = []
                 substitutions.append(('@registry@', model.build.registry.replace('@name@', ms_name)))
                 substitutions.append(('@dockerfile@', ms_dockerfile))
-                create_file(expanded_create, expanded_destroy, build_template, 'build', ms_name, substitutions)
+                build_template_args = build_template.replace("@docker_args@", model.build.build_args)
+                create_file(expanded_create, expanded_destroy, build_template_args, 'build', ms_name, substitutions)
     if arg_operation == 'any' or arg_operation == 'deploy':
         expanded_create = ''
         if model.deployments is not None and model.deployments.default is not None and model.deployments.default.expand is not None:

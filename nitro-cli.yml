@@ -27,8 +27,8 @@ commands:
   - name: build
     description: Build the docker image
     steps: 
-      - script: docker build -t nitroagility/nitro-bitbucket-pipelines:58 -f ./bitbucket/Dockerfile .
+      - script: docker build -t nitroagility/nitro-bitbucket-pipelines:59 -f ./bitbucket/Dockerfile .
   - name: push
     description: Build the docker image
     steps:
-      - script: docker push nitroagility/nitro-bitbucket-pipelines:58
+      - script: docker push nitroagility/nitro-bitbucket-pipelines:59
