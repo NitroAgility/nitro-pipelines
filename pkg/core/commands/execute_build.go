@@ -20,8 +20,7 @@ import (
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
 )
 
-const tpl = `
-#!/bin/bash
+const buildTpl = `#!/bin/bash
 aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
@@ -34,12 +33,12 @@ docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPE
 `
 
 func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
-    tmpl, _ :=  template.New("BUILD").Parse(tpl)
-	var tpl bytes.Buffer
-	if err := tmpl.Execute(&tpl, buildCtx); err != nil {
-        fmt.Print(tpl.String())
+    tmpl, _ :=  template.New("BUILD").Parse(buildTpl)
+	var buffer bytes.Buffer
+	if err := tmpl.Execute(&buffer, buildCtx); err != nil {
+        fmt.Print(buffer.String())
 		return err
 	}
-    fmt.Print(tpl.String())
+    fmt.Print(buffer.String())
     return nil
 }

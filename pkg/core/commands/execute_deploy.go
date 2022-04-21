@@ -12,6 +12,33 @@ limitations under the License.
 */
 package commands
 
-func ExecuteDeploy() {
+import (
+	"bytes"
+	"fmt"
+	"text/template"
 
+	"github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
+)
+
+const DeployTpl = `#!/bin/bash
+aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
+aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
+aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
+aws ecr create-repository --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
+docker build -t {{ .ImageName }}:latest {{ .DockerArgs }} -f {{ .Dockerfile }} .
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
+docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+`
+
+func ExecuteDeploy(deployCtx *contexts.DeployContext) (error) {
+    tmpl, _ :=  template.New("BUILD").Parse(DeployTpl)
+	var buffer bytes.Buffer
+	if err := tmpl.Execute(&buffer, deployCtx); err != nil {
+        fmt.Print(buffer.String())
+		return err
+	}
+    fmt.Print(buffer.String())
+    return nil
 }

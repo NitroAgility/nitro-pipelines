@@ -40,7 +40,9 @@ func main() {
 				}
 			}
 		} else if strings.ToUpper(os.Args[1]) == "DEPLOY" { 
-			commands.ExecuteDeploy()
+			deployCtx := contexts.NewDeployContext("XYZ", msModel.Build.BuildArgs, "ABC")
+			commands.ExecuteDeploy(deployCtx)
+			return
 		}	
 	}
 	log.Fatal("Invalid command.")
