@@ -25,21 +25,20 @@ const DeployTpl = `#!/bin/bash
 aws configure set aws_access_key_id $NITRO_PIPELINES_SOURCE_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_SOURCE_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_SOURCE_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY
-
+{{ range .Images -}}
 docker pull $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
-
+{{ end -}}
 aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
-
+{{ range .Images -}}
 aws ecr create-repository --repository-name {{ .TargetImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
 docker tag $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
 docker tag $NITRO_PIPELINES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:latest
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:latest
-
+{{ end -}}
 aws eks --region $NITRO_PIPELINES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_TARGET_AWS_EKS_CLUSTER_NAME
-
 #--PRE-DEPLOYMENT
 helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment={{ .Environment }} --set infrastructure.domain="$NITRO_PIPELINES_DOMAIN" --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER {{ .HelmArgs }} -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
 #--POST-DEPLOYMENT

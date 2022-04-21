@@ -18,15 +18,15 @@ import (
 	"strings"
 )
 
-type MicroserviceContext struct {
+type ImageContext struct {
 	SourceImageName string
 	TargetImageName	string
 }
 
 type DeployContext struct {
-	Environment 			string
-	MicroserviceContext		[]MicroserviceContext
-	HelmArgs				string
+	Environment string
+	Images		[]ImageContext
+	HelmArgs	string
 }
 
 // Creational functions
@@ -39,15 +39,15 @@ func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
 		return nil, err
 	}
 	context := &DeployContext {
-		Environment 		: strings.ToUpper(os.Getenv("ENV")),
-		MicroserviceContext	: []MicroserviceContext{},
-		HelmArgs			: msModel.Deployments.Default.Helm.Parameters,
+		Environment 	: strings.ToUpper(os.Getenv("ENV")),
+		Images			: []ImageContext{},
+		HelmArgs		: msModel.Deployments.Default.Helm.Parameters,
 	}
 	for _, m := range msModel.Microservices {
-		msCtx := MicroserviceContext {}
-		msCtx.SourceImageName = fmt.Sprintf("%s-%s", envSource, m.Name)
-		msCtx.TargetImageName = fmt.Sprintf("%s-%s", envTarget, m.Name)
-		context.MicroserviceContext = append(context.MicroserviceContext, msCtx)
+		msCtx := ImageContext {}
+		msCtx.SourceImageName 	= fmt.Sprintf("%s-%s", envSource, m.Name)
+		msCtx.TargetImageName 	= fmt.Sprintf("%s-%s", envTarget, m.Name)
+		context.Images			= append(context.Images, msCtx)
 	}
 	return context, nil
 }
