@@ -1,29 +1,28 @@
 # applicative microservices
 microservices:
-  - name: contoflow-protocols-webapp
-    dockerfile: ./microservices/contoflow_protocols/webapp/Dockerfile
+  - name: ms-sample-1
+    dockerfile: ./microservices/ms_sample_1/Dockerfile
+  - name: ms-sample-2
+    dockerfile: ./microservices/p24_next_platform/api/Dockerfile
 build:
+  build_args: ''
   expand:
     - variable: PIPE_BUILD_ENV_FILE
       type: environment
-  registry: '@name@'
+  registry: 'build-@name@'
 deployments:
   default:
     expand:
-      - variable: PIPE_${ENV}_ENV_FILE
+      - variable: PIPE_{{ .Environment }}_ENV_FILE
         type: environment
-      - variable: 'PIPE_${ENV}_PLATFORM_ENV_FILE'
+      - variable:  'PIPE_{{ .Environment }}_PLATFORM_ENV_FILE'
         name: platform
-        type: file
-        file_name: protocols
-      - variable:  'PIPE_${ENV}_PROTOCOLS_ENV_FILE'
-        name: protocols
         type: file
     registry: '@promotion-env@-@name@'
     scripts:
       pre_execution: ''
-      pre_deployment: 'source ./database/scripts/deployment.sh'
+      pre_deployment: ''
       post_deployment: ''
       post_execution:  ''
     helm:
-      parameters: --set env.platform="$(base64 -w 0 ./platform.env)" --set env.protocols="$(base64 -w 0 ./protocols.env)"
+      parameters: --set env.platform="$(base64 -w 0 ./platform.env)"

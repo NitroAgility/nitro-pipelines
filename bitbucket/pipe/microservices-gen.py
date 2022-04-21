@@ -48,7 +48,7 @@ class Default(BaseModel):
 
 class Deployments(BaseModel):
     default: Default
-    
+
 
 class Model(BaseModel):
     microservices: List[Microservice]
@@ -100,8 +100,8 @@ aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker 
 @post_promotion@
 aws eks --region $NITRO_PIPELINES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_TARGET_AWS_EKS_CLUSTER_NAME
 @pre_deployment@
-helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain="$NITRO_PIPELINES_DOMAIN" --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
-@post_deployment@
+
+@post_deployment@helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment=@env@ --set infrastructure.domain="$NITRO_PIPELINES_DOMAIN" --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER @helm_parameters@ -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
 @post_execution@"""
 
 
