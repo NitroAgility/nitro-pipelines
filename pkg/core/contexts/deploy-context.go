@@ -12,18 +12,42 @@ limitations under the License.
 */
 package contexts
 
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+type MicroserviceContext struct {
+	SourceImageName string
+	TargetImageName	string
+}
+
 type DeployContext struct {
-	Dockerfile 	string
-	DockerArgs 	string
-	ImageName	string
+	Environment 			string
+	MicroserviceContext		[]MicroserviceContext
+	HelmArgs				string
 }
 
 // Creational functions
 
-func NewDeployContext(dockerfile string, dockerArgs string, imageName string) *DeployContext {
-	return &DeployContext {
-		Dockerfile: dockerfile,
-		DockerArgs: dockerArgs,
-		ImageName: imageName,
+func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
+	msModel, err := loadMicroservicesFile(microservicesFile)
+	envSource := strings.ToUpper(os.Getenv("ENV_SOURCE"))
+	envTarget := strings.ToUpper(os.Getenv("ENV_TARGET"))
+	if err != nil {
+		return nil, err
 	}
+	context := &DeployContext {
+		Environment 		: strings.ToUpper(os.Getenv("ENV")),
+		MicroserviceContext	: []MicroserviceContext{},
+		HelmArgs			: msModel.Deployments.Default.Helm.Parameters,
+	}
+	for _, m := range msModel.Microservices {
+		msCtx := MicroserviceContext {}
+		msCtx.SourceImageName = fmt.Sprintf("%s-%s", envSource, m.Name)
+		msCtx.TargetImageName = fmt.Sprintf("%s-%s", envTarget, m.Name)
+		context.MicroserviceContext = append(context.MicroserviceContext, msCtx)
+	}
+	return context, nil
 }

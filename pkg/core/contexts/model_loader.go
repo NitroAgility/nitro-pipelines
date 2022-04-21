@@ -13,18 +13,35 @@ limitations under the License.
 package contexts
 
 import (
+	"bytes"
 	"os"
 	"strings"
+	"text/template"
+
+	"github.com/NitroAgility/nitro-pipelines/pkg/core/models"
+	"gopkg.in/yaml.v2"
 )
 
-type Context struct {
+type context struct {
 	Environment	string
 }
 
-// Creational functions
-
-func NewContext() *Context {
-	return &Context {
+func loadMicroservicesFile(microservicesFile string) (*models.MicroservicesModel, error) {
+	var microservicesModel = &models.MicroservicesModel{}
+    tmpl, err := template.ParseFiles(microservicesFile)
+	if err != nil {
+		return nil, err
+	}
+	context := &context {
 		Environment: strings.ToUpper(os.Getenv("ENV")),
 	}
+	var tpl bytes.Buffer
+	if err := tmpl.Execute(&tpl, *context); err != nil {
+		return nil, err
+	}
+	err = yaml.Unmarshal(tpl.Bytes(), microservicesModel)
+	if err != nil {
+		return nil, err
+	}
+	return microservicesModel, nil
 }

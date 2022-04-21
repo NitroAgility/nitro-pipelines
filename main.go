@@ -14,37 +14,40 @@ limitations under the License.
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/commands"
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
-	"github.com/NitroAgility/nitro-pipelines/pkg/core/models"
 )
 
 func main() {
-	context := contexts.NewContext()
-	msModel, _ := models.LoadMicroservicesFile("./test/microservices.yml", context)
+	msFilePath := strings.ToUpper(os.Getenv("NITRO_PIPELINES_MICROSERVICES_PATH"))
+	if len(msFilePath) == 0 {
+		msFilePath = "./microservices.yml"
+	}
 	if len(os.Args) > 1 {
 		if strings.ToUpper(os.Args[1]) == "BUILD" {
-			if len(os.Args) < 3 {
-				log.Fatal("Invalid command.")
-				os.Exit(1)
-			}
-			for _, n := range msModel.Microservices {
-				if n.Name == os.Args[2]{
-					buildCtx := contexts.NewBuildContext(n.Dockerfile, msModel.Build.BuildArgs, n.Name)
-					commands.ExecuteBuild(buildCtx)
-					return
+			if len(os.Args) > 2 {
+				buildCtx, err := contexts.NewBuildContext(msFilePath, os.Args[2])
+				if err != nil {
+					fmt.Println("An error has occurred whilst executing the command, ", err)
+					os.Exit(1)
 				}
+				commands.ExecuteBuild(buildCtx)
+				return
 			}
 		} else if strings.ToUpper(os.Args[1]) == "DEPLOY" { 
-			deployCtx := contexts.NewDeployContext("XYZ", msModel.Build.BuildArgs, "ABC")
+			deployCtx, err := contexts.NewDeployContext(msFilePath)
+			if err != nil {
+				fmt.Println("An error has occurred whilst executing the command, ", err)
+				os.Exit(1)
+			}
 			commands.ExecuteDeploy(deployCtx)
 			return
 		}	
 	}
-	log.Fatal("Invalid command.")
+	fmt.Println("Invalid command.")
 	os.Exit(1)
 }

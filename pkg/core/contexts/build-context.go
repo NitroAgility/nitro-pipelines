@@ -12,6 +12,12 @@ limitations under the License.
 */
 package contexts
 
+import (
+	"errors"
+
+	"github.com/NitroAgility/nitro-pipelines/pkg/core/models"
+)
+
 type BuildContext struct {
 	Dockerfile 	string
 	DockerArgs 	string
@@ -20,10 +26,23 @@ type BuildContext struct {
 
 // Creational functions
 
-func NewBuildContext(dockerfile string, dockerArgs string, imageName string) *BuildContext {
-	return &BuildContext {
-		Dockerfile: dockerfile,
-		DockerArgs: dockerArgs,
-		ImageName: imageName,
+func NewBuildContext(microservicesFile string, msName string) (*BuildContext, error) {
+	msModel, err := loadMicroservicesFile(microservicesFile)
+	if err != nil {
+		return nil, err
 	}
+	var microservice *models.Microservices
+	for _, m := range msModel.Microservices {
+		if m.Name == msName {
+			microservice = &m
+		}
+	}
+	if microservice == nil {
+		return nil, errors.New("invalid microservice name")
+	}
+	return &BuildContext {
+		Dockerfile: microservice.Dockerfile,
+		DockerArgs: msModel.Build.BuildArgs,
+		ImageName: microservice.Name,
+	}, nil
 }
