@@ -12,8 +12,34 @@ limitations under the License.
 */
 package commands
 
-import "github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
+import (
+	"bytes"
+	"fmt"
+	"text/template"
 
-func ExecuteBuild(buildCtx *contexts.BuildContext) {
+	"github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
+)
 
+const tpl = `
+#!/bin/bash
+aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
+aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
+aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
+aws ecr create-repository --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
+docker build -t {{ .ImageName }}:latest {{ .DockerArgs }} -f {{ .Dockerfile }} .
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
+docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+`
+
+func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
+    tmpl, _ :=  template.New("BUILD").Parse(tpl)
+	var tpl bytes.Buffer
+	if err := tmpl.Execute(&tpl, buildCtx); err != nil {
+        fmt.Print(tpl.String())
+		return err
+	}
+    fmt.Print(tpl.String())
+    return nil
 }
