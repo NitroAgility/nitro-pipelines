@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Project file
+nitro-build.sh
+nitro-deploy.sh

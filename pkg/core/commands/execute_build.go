@@ -39,6 +39,8 @@ func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
         fmt.Print(buffer.String())
 		return err
 	}
-    fmt.Print(buffer.String())
+    if err := saveToFile("nitro-build.sh", buffer.Bytes()); err != nil {
+		return err
+	}
     return nil
 }
