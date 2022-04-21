@@ -21,20 +21,15 @@ type Microservices struct {
 	Name       string `yaml:"name"`
 	Dockerfile string `yaml:"dockerfile"`
 }
-type BuildExpand struct {
-	Variable string `yaml:"variable"`
-	Type     string `yaml:"type"`
-}
-type Build struct {
-	BuildArgs   string `yaml:"build_args"`
-	Expand   	[]BuildExpand `yaml:"expand"`
-	Registry 	string   `yaml:"registry"`
-}
-type DeploymentExpand struct {
+type Expand struct {
 	Variable string `yaml:"variable"`
 	Type     string `yaml:"type"`
 	Name     string `yaml:"name,omitempty"`
-	FileName string `yaml:"file_name,omitempty"`
+}
+type Build struct {
+	BuildArgs   string 		`yaml:"build_args"`
+	Expand   	[]Expand 	`yaml:"expand"`
+	Registry 	string   	`yaml:"registry"`
 }
 type DeploymentScripts struct {
 	PreExecution   string `yaml:"pre_execution"`
@@ -46,8 +41,7 @@ type DeploymentHelm struct {
 	Parameters string `yaml:"parameters"`
 }
 type Default struct {
-	Expand   []DeploymentExpand `yaml:"expand"`
-	Registry string   `yaml:"registry"`
+	Expand   []Expand 			`yaml:"expand"`
 	Scripts  DeploymentScripts  `yaml:"scripts"`
 	Helm     DeploymentHelm     `yaml:"helm"`
 }

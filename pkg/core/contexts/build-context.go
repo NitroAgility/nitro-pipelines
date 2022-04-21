@@ -18,7 +18,14 @@ import (
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/models"
 )
 
+type BuildExpandContext struct {
+	Variable string
+	Type	string
+	Name	string
+}
+
 type BuildContext struct {
+	Expand		[]BuildExpandContext
 	Dockerfile 	string
 	DockerArgs 	string
 	ImageName	string
@@ -40,9 +47,17 @@ func NewBuildContext(microservicesFile string, msName string) (*BuildContext, er
 	if microservice == nil {
 		return nil, errors.New("invalid microservice name")
 	}
-	return &BuildContext {
+	context := &BuildContext {
 		Dockerfile: microservice.Dockerfile,
 		DockerArgs: msModel.Build.BuildArgs,
 		ImageName: microservice.Name,
-	}, nil
+	}
+	for _, e := range msModel.Deployments.Default.Expand {
+		expCtx := BuildExpandContext {}
+		expCtx.Variable = e.Variable
+		expCtx.Type 	= e.Type
+		expCtx.Name 	= e.Name
+		context.Expand	= append(context.Expand, expCtx)
+	}
+	return context, nil
 }

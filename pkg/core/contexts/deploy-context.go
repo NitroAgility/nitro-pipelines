@@ -18,15 +18,26 @@ import (
 	"strings"
 )
 
-type ImageContext struct {
+type DeployExpandContext struct {
+	Variable string
+	Type	string
+	Name	string
+}
+
+type DeployImageContext struct {
 	SourceImageName string
 	TargetImageName	string
 }
 
 type DeployContext struct {
-	Environment string
-	Images		[]ImageContext
-	HelmArgs	string
+	Environment 	string
+	PreExecution	string
+	PostExecution	string
+	PreDeployment	string
+	PostDeployment	string
+	Expand			[]DeployExpandContext
+	Images			[]DeployImageContext
+	HelmArgs		string
 }
 
 // Creational functions
@@ -40,11 +51,23 @@ func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
 	}
 	context := &DeployContext {
 		Environment 	: strings.ToUpper(os.Getenv("ENV")),
-		Images			: []ImageContext{},
+		PreExecution	: buildScript(msModel.Deployments.Default.Scripts.PreExecution),
+		PostExecution	: buildScript(msModel.Deployments.Default.Scripts.PostExecution),
+		PreDeployment	: buildScript(msModel.Deployments.Default.Scripts.PreDeployment),
+		PostDeployment	: buildScript(msModel.Deployments.Default.Scripts.PostDeployment),
+		Expand			: []DeployExpandContext{},
+		Images			: []DeployImageContext{},
 		HelmArgs		: msModel.Deployments.Default.Helm.Parameters,
 	}
+	for _, e := range msModel.Deployments.Default.Expand {
+		expCtx := DeployExpandContext {}
+		expCtx.Variable = e.Variable
+		expCtx.Type 	= e.Type
+		expCtx.Name 	= e.Name
+		context.Expand	= append(context.Expand, expCtx)
+	}
 	for _, m := range msModel.Microservices {
-		msCtx := ImageContext {}
+		msCtx := DeployImageContext {}
 		msCtx.SourceImageName 	= fmt.Sprintf("%s-%s", envSource, m.Name)
 		msCtx.TargetImageName 	= fmt.Sprintf("%s-%s", envTarget, m.Name)
 		context.Images			= append(context.Images, msCtx)

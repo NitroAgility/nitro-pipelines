@@ -18,7 +18,6 @@ deployments:
       - variable:  'PIPE_{{ .Environment }}_PLATFORM_ENV_FILE'
         name: platform
         type: file
-    registry: '@promotion-env@-@name@'
     scripts:
       pre_execution: ''
       pre_deployment: ''
