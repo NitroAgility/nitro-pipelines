@@ -23,6 +23,14 @@ import (
 const DeployTpl = `#!/bin/bash
 # Pre execution
 {{ .PreExecution }}
+# Expanding variables
+{{ range .Expand -}}
+echo ${{ .Variable }} | base64 --decode >> {{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
+{{ if .Type eq "file" }}
+source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+{{ end }}
+rm -f ./{{ .Name }}.env
+{{ end -}}
 # Environment configuration
 aws configure set aws_access_key_id $NITRO_PIPELINES_SOURCE_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_SOURCE_AWS_SECRET_ACCESS
