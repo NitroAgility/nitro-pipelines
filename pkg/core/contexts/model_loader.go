@@ -22,7 +22,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type context struct {
+type modelContext struct {
 	Environment	string
 }
 
@@ -32,11 +32,11 @@ func loadMicroservicesFile(microservicesFile string) (*models.MicroservicesModel
 	if err != nil {
 		return nil, err
 	}
-	context := &context {
+	modelContext := &modelContext {
 		Environment: strings.ToUpper(os.Getenv("ENV")),
 	}
 	var tpl bytes.Buffer
-	if err := tmpl.Execute(&tpl, *context); err != nil {
+	if err := tmpl.Execute(&tpl, *modelContext); err != nil {
 		return nil, err
 	}
 	err = yaml.Unmarshal(tpl.Bytes(), microservicesModel)
