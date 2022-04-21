@@ -13,7 +13,7 @@ limitations under the License.
 package contexts
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"strings"
 )
@@ -46,6 +46,9 @@ func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
 	msModel, err := loadMicroservicesFile(microservicesFile)
 	envSource := strings.ToUpper(os.Getenv("ENV_SOURCE"))
 	envTarget := strings.ToUpper(os.Getenv("ENV_TARGET"))
+	if len(envTarget) == 0 {
+		return nil, errors.New("target environment cannot be null")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -63,13 +66,13 @@ func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
 		expCtx := DeployExpandContext {}
 		expCtx.Variable = e.Variable
 		expCtx.Type 	= e.Type
-		expCtx.Name 	= e.Name
+		expCtx.Name 	= buildFileName(e.Name)
 		context.Expand	= append(context.Expand, expCtx)
 	}
 	for _, m := range msModel.Microservices {
 		msCtx := DeployImageContext {}
-		msCtx.SourceImageName 	= fmt.Sprintf("%s-%s", envSource, m.Name)
-		msCtx.TargetImageName 	= fmt.Sprintf("%s-%s", envTarget, m.Name)
+		msCtx.SourceImageName 	= buildImageName(m.Name, envSource)
+		msCtx.TargetImageName 	= buildImageName(m.Name, envTarget)
 		context.Images			= append(context.Images, msCtx)
 	}
 	return context, nil

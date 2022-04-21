@@ -13,6 +13,7 @@
             "args": [ "build", "ms-sample-1"],
             "env": {
                 "ENV": "DEV",
+                "ENV_TARGET": "DEV",
                 "NITRO_PIPELINES_MICROSERVICES_PATH": "./test/microservices.yml"
             }
         },

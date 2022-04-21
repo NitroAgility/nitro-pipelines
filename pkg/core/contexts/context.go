@@ -12,9 +12,33 @@ limitations under the License.
 */
 package contexts
 
+import (
+	"fmt"
+	"strings"
+
+	"github.com/google/uuid"
+)
+
 func buildScript(script string) string {
 	if len(script) > 0 {
 		return script
 	}
 	return "# No script was provided"
+}
+
+func buildFileName(fileName string) string {
+	if len(fileName) > 0 {
+		return fileName
+	}
+	return  uuid.New().String()
+}
+
+func buildImageName(imageName string, env string) string {
+	if len(imageName) == 0 {
+		return imageName
+	}
+	if len(env) == 0 {
+		return strings.ToLower(fmt.Sprintf("build-%s", imageName))
+	}
+	return strings.ToLower(fmt.Sprintf("%s-%s", env, imageName))
 }

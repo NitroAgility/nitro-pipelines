@@ -14,6 +14,7 @@ package contexts
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/models"
 )
@@ -50,13 +51,13 @@ func NewBuildContext(microservicesFile string, msName string) (*BuildContext, er
 	context := &BuildContext {
 		Dockerfile: microservice.Dockerfile,
 		DockerArgs: msModel.Build.BuildArgs,
-		ImageName: microservice.Name,
+		ImageName: fmt.Sprintf("build-%s", microservice.Name),
 	}
 	for _, e := range msModel.Deployments.Default.Expand {
 		expCtx := BuildExpandContext {}
 		expCtx.Variable = e.Variable
 		expCtx.Type 	= e.Type
-		expCtx.Name 	= e.Name
+		expCtx.Name 	= buildFileName(e.Name)
 		context.Expand	= append(context.Expand, expCtx)
 	}
 	return context, nil
