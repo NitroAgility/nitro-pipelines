@@ -9,7 +9,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
-./nitro $1 $2
+/nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
@@ -17,7 +17,7 @@ if [ $1 = "build" ]; then
         exit
     else
         echo $2
-        declare script_name="./nitro-build.sh"
+        declare script_name="/nitro-build.sh"
         if test -f $script_name; then
             source $script_name
         else
@@ -26,7 +26,7 @@ if [ $1 = "build" ]; then
         fi
     fi
 else
-    script_name="./nitro-deploy.sh"
+    script_name="/nitro-deploy.sh"
     if test -f $script_name; then
         source $script_name
     else
