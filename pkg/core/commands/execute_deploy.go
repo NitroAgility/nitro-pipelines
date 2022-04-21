@@ -68,7 +68,7 @@ func ExecuteDeploy(deployCtx *contexts.DeployContext) (error) {
         fmt.Print(buffer.String())
 		return err
 	}
-    if err := saveToFile("nitro-deploy.sh", buffer.Bytes()); err != nil {
+    if err := saveToFile("/nitro-deploy.sh", buffer.Bytes()); err != nil {
 		return err
 	}
     return nil
