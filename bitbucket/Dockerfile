@@ -21,10 +21,13 @@ WORKDIR /root
 
 # Install required tools
 RUN apt-get update && apt install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa 
-RUN apt-get update && apt-get install -y unzip \
-    curl \
-    uuid-runtime \
-    gettext-base 
+RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get install -y unzip \
+    -y curl \
+    -y uuid-runtime \
+    -y gettext-base \
+    -y python3.9 \
+    -y python3-pip \
+    -y python3.9-venv
 
 # Install AWS Cli
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install && rm awscliv2.zip && rm -rf awscliv2
@@ -40,7 +43,7 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master
 RUN  echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
 
 # Set permissions on files
-RUN chmod +x /nitro && chmod +x /nitro-pipe && chmod +x /nitro-pipe-expand-base64-env
+RUN chmod +x /nitro && chmod +x /nitro-pipe
 
 # Define default command.
 CMD ["bash"]

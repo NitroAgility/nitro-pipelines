@@ -25,7 +25,7 @@ import (
 func main() {
 	msFilePath := os.Getenv("NITRO_PIPELINES_MICROSERVICES_PATH")
 	if len(msFilePath) == 0 {
-		msFilePath = ".nitro/microservices/microservices.yml"
+		msFilePath = "microservices.yml"
 	}
 	if len(os.Args) > 1 {
 		if strings.ToUpper(os.Args[1]) == "BUILD" {
