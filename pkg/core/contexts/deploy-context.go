@@ -44,16 +44,19 @@ type DeployContext struct {
 
 func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
 	msModel, err := loadMicroservicesFile(microservicesFile)
+	if err != nil {
+		return nil, err
+	}
 	envSource := strings.ToUpper(os.Getenv("ENV_SOURCE"))
 	envTarget := strings.ToUpper(os.Getenv("ENV_TARGET"))
 	if len(envTarget) == 0 {
 		return nil, errors.New("target environment cannot be null")
 	}
-	if err != nil {
-		return nil, err
+	if len(envSource) == 0 {
+		envSource = "BUILD"
 	}
 	context := &DeployContext {
-		Environment 	: strings.ToUpper(os.Getenv("ENV")),
+		Environment 	: strings.ToLower(os.Getenv("ENV_TARGET")),
 		PreExecution	: buildScript(msModel.Deployments.Default.Scripts.PreExecution),
 		PostExecution	: buildScript(msModel.Deployments.Default.Scripts.PostExecution),
 		PreDeployment	: buildScript(msModel.Deployments.Default.Scripts.PreDeployment),
