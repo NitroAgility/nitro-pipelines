@@ -15,6 +15,8 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"strings"
 	"text/template"
 
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
@@ -25,11 +27,11 @@ const DeployTpl = `#!/bin/bash
 {{ .PreExecution }}
 # Expanding variables
 {{ range .Expand -}}
-echo ${{ .Variable }} | base64 --decode >> {{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
-{{ if eq .Type "file" -}}
-source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+echo ${{ .Variable }} | base64 --decode >> /{{ .Name }}.tmp && envsubst < /{{ .Name }}.tmp > /{{ .Name }}.env && rm /{{ .Name }}.tmp
+{{ if eq .Type "environment" -}}
+source /{{ .Name }}.env && export $(cut -d= -f1 /{{ .Name }}.env)
+rm -f /{{ .Name -}}.env
 {{ end -}}
-rm -f ./{{ .Name -}}.env
 {{ end -}}
 # Environment configuration
 aws configure set aws_access_key_id $NITRO_PIPELINES_SOURCE_AWS_ACCESS_KEY
@@ -57,6 +59,12 @@ aws eks --region $NITRO_PIPELINES_TARGET_AWS_REGION update-kubeconfig --name $NI
 helm upgrade --install $NITRO_PIPELINES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_TARGET_HELM_CHART_NAME" --set environment={{ .Environment }} --set infrastructure.domain="$NITRO_PIPELINES_DOMAIN" --set infrastructure.docker_registry=$NITRO_PIPELINES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER {{ .HelmArgs }} -n $NITRO_PIPELINES_TARGET_HELM_NAMESPACE
 # Post deployment
 {{ .PostDeployment }}
+# Cleaning expanded variables
+{{ range .Expand -}}
+{{ if eq .Type "file" -}}
+rm -f /{{ .Name -}}.env
+{{ end -}}
+{{ end -}}
 # Post execution
 {{ .PostExecution }}
 `
@@ -68,8 +76,12 @@ func ExecuteDeploy(deployCtx *contexts.DeployContext) (error) {
         fmt.Print(buffer.String())
 		return err
 	}
-    if err := saveToFile("/nitro-deploy.sh", buffer.Bytes()); err != nil {
-		return err
+	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
+		fmt.Println(buffer.String())
+	} else {
+		if err := saveToFile("/nitro-deploy.sh", buffer.Bytes()); err != nil {
+			return err
+		}
 	}
     return nil
 }

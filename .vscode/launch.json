@@ -10,11 +10,12 @@
             "request": "launch",
             "mode": "auto",
             "program": "./main.go",
-            "args": [ "build", "ms-sample-1"],
+            "args": [ "build", "p24-next-telegram-bot"],
             "env": {
                 "ENV": "DEV",
                 "ENV_TARGET": "DEV",
-                "NITRO_PIPELINES_MICROSERVICES_PATH": "./test/microservices.yml"
+                "NITRO_PIPELINES_MICROSERVICES_PATH": "./test/microservices.yml",
+                "DRY_RUN": "false",
             }
         },
     ]

@@ -1,15 +1,14 @@
 # applicative microservices
 microservices:
-  - name: ms-sample-1
-    dockerfile: ./microservices/ms_sample_1/Dockerfile
-  - name: ms-sample-2
+  - name: p24-next-telegram-bot
+    dockerfile: ./microservices/p24_next_telegram_bot/Dockerfile
+  - name: p24-next-platform-api
     dockerfile: ./microservices/p24_next_platform/api/Dockerfile
 build:
   build_args: ''
   expand:
     - variable: PIPE_BUILD_ENV_FILE
       type: environment
-  registry: 'build-@name@'
 deployments:
   default:
     expand:
@@ -24,4 +23,4 @@ deployments:
       post_deployment: ''
       post_execution:  ''
     helm:
-      parameters: --set env.platform="$(base64 -w 0 ./platform.env)"
+      parameters: --set env.platform="$(base64 -w 0 /platform.env)"

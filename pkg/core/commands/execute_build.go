@@ -15,21 +15,40 @@ package commands
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"strings"
 	"text/template"
 
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/contexts"
 )
 
 const buildTpl = `#!/bin/bash
+# Expanding variables
+{{ range .Expand -}}
+echo ${{ .Variable }} | base64 --decode >> /{{ .Name }}.tmp && envsubst < /{{ .Name }}.tmp > /{{ .Name }}.env && rm /{{ .Name }}.tmp
+{{ if eq .Type "environment" -}}
+source /{{ .Name }}.env && export $(cut -d= -f1 /{{ .Name }}.env)
+rm -f /{{ .Name -}}.env
+{{ end -}}
+{{ end -}}
+# Environment configuration
 aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 aws ecr create-repository --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
+# Docker build
 docker build -t {{ .ImageName }}:latest {{ .DockerArgs }} -f {{ .Dockerfile }} .
+# Docker push
 docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
 docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
 docker push $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+# Cleaning expanded variables
+{{ range .Expand -}}
+{{ if eq .Type "file" -}}
+rm -f /{{ .Name -}}.env
+{{ end -}}
+{{ end -}}
 `
 
 func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
@@ -39,8 +58,13 @@ func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
         fmt.Print(buffer.String())
 		return err
 	}
-    if err := saveToFile("/nitro-build.sh", buffer.Bytes()); err != nil {
-		return err
+	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
+		fmt.Println(buffer.String())
+	} else {
+		fileName := fmt.Sprintf("/nitro-%s-build.sh",buildCtx.Name)
+		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
+			return err
+		}
 	}
     return nil
 }

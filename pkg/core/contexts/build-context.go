@@ -26,6 +26,7 @@ type BuildExpandContext struct {
 }
 
 type BuildContext struct {
+	Name		string
 	Expand		[]BuildExpandContext
 	Dockerfile 	string
 	DockerArgs 	string
@@ -39,21 +40,24 @@ func NewBuildContext(microservicesFile string, msName string) (*BuildContext, er
 	if err != nil {
 		return nil, err
 	}
-	var microservice *models.Microservices
+	var microservice models.Microservices
+	exists := false
 	for _, m := range msModel.Microservices {
 		if m.Name == msName {
-			microservice = &m
+			microservice = m
+			exists = true
 		}
 	}
-	if microservice == nil {
+	if !exists {
 		return nil, errors.New("invalid microservice name")
 	}
 	context := &BuildContext {
-		Dockerfile: microservice.Dockerfile,
-		DockerArgs: msModel.Build.BuildArgs,
-		ImageName: fmt.Sprintf("build-%s", microservice.Name),
+		Name		: microservice.Name,
+		Dockerfile	: microservice.Dockerfile,
+		DockerArgs	: msModel.Build.BuildArgs,
+		ImageName	: fmt.Sprintf("build-%s", microservice.Name),
 	}
-	for _, e := range msModel.Deployments.Default.Expand {
+	for _, e := range msModel.Build.Expand {
 		expCtx := BuildExpandContext {}
 		expCtx.Variable = e.Variable
 		expCtx.Type 	= e.Type

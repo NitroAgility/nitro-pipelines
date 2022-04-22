@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	msFilePath := strings.ToUpper(os.Getenv("NITRO_PIPELINES_MICROSERVICES_PATH"))
+	msFilePath := os.Getenv("NITRO_PIPELINES_MICROSERVICES_PATH")
 	if len(msFilePath) == 0 {
 		msFilePath = ".nitro/microservices/microservices.yml"
 	}
