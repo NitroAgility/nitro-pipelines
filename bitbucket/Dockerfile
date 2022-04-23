@@ -22,12 +22,12 @@ WORKDIR /root
 # Install required tools
 RUN apt-get update && apt install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa 
 RUN export DEBIAN_FRONTEND="noninteractive" && apt-get update && apt-get install -y unzip \
-    -y curl \
-    -y uuid-runtime \
-    -y gettext-base \
-    -y python3.9 \
-    -y python3-pip \
-    -y python3.9-venv
+    curl \
+    uuid-runtime \
+    gettext-base \
+    python3.9 \
+    python3-pip \
+    python3.10-venv
 
 # Install AWS Cli
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install && rm awscliv2.zip && rm -rf awscliv2
