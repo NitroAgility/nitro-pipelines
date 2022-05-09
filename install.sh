@@ -1,5 +1,8 @@
 #!/bin/bash
 git clone https://github.com/NitroAgility/nitro-pipelines.git
-cd ./nitro-pipelines && go install . && go build -o nitro && mv ./nitro ../nitro
-curl https://raw.githubusercontent.com/NitroAgility/nitro-pipelines/main/bitbucket/pipe/nitro-pipe -o ./nitro-pipe
+pushd ./nitro-pipelines > /dev/null
+go install . && go build -o nitro 
+mv ./nitro ../nitro
+mv ./nitro ../nitro-pipe
+popd > /dev/null
 chmod +x ./nitro && chmod +x ./nitro-pipe
