@@ -6,3 +6,4 @@ mv ./nitro ../nitro
 mv ./jenkins/nitro-pipe ../nitro-pipe
 popd > /dev/null
 chmod +x ./nitro && chmod +x ./nitro-pipe
+rm -rf ./nitro-pipelines
