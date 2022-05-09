@@ -1,0 +1,35 @@
+#!/bin/bash
+eval export CONTEXT_ENV_B64=$NITRO_PIPELINES_ENV_FILE
+filename=$(uuidgen)
+echo $CONTEXT_ENV_B64 | base64 --decode >> /$filename.tmp && envsubst < /$filename.tmp > /$filename.env && rm /$filename.tmp
+source /$filename.env && export $(cut -d= -f1 /$filename.env)
+rm -f /$filename.env
+if [ -z "$1" ]; then
+    echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
+    exit 1
+fi
+cwd=$(dirname "$0")
+./nitro $1 $2
+if [[ $? -ne 0 ]]; then exit 1;fi
+if [ $1 = "build" ]; then
+    if [ -z "$2" ]; then
+        echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
+        exit
+    else
+        echo $2
+        declare script_name="./nitro-$2-build.sh"
+        if test -f $script_name; then
+            source $script_name
+        else
+            $script_name = dx
+            echo "File $script_name doesn't exists."
+        fi
+    fi
+else
+    script_name="./nitro-deploy.sh"
+    if test -f $script_name; then
+        source $script_name
+    else
+        echo "File $script_name doesn't exists."
+    fi
+fi
