@@ -40,13 +40,21 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
 # Environment configuration
+echo STEP 1
 aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
+echo STEP 2
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo STEP 3
 aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCESS
+echo STEP 4
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo STEP 5
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
+echo STEP 6
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo STEP 7
 aws ecr create-repository --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
+echo STEP 8
 # Docker build
 docker build -t {{ .ImageName }}:latest {{ .DockerArgs }} -f {{ .Dockerfile }} .
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
