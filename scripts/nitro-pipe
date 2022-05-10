@@ -9,6 +9,7 @@ if [ -z "$1" ]; then
     echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
     exit 1
 fi
+
 exit 0
 cwd=$(dirname "$0")
 ./nitro $1 $2
