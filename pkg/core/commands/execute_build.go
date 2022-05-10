@@ -75,7 +75,7 @@ func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
 	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
 		fmt.Println(buffer.String())
 	} else {
-		fileName := fmt.Sprintf("/nitro-%s-build.sh",buildCtx.Name)
+		fileName := fmt.Sprintf("./nitro-%s-build.sh",buildCtx.Name)
 		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
 			return err
 		}
