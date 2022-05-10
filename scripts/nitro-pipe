@@ -4,11 +4,8 @@ filename=$(uuidgen)
 echo $CONTEXT_ENV_B64 | base64 --decode >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
 if [ -s ./$filename.env  ]; then
 	source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
-else
-	echo "File ./$filename.env is empty"
-    exit 1
+    rm -f ./$filename.env
 fi
-rm -f ./$filename.env
 if [ -z "$1" ]; then
     echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
     exit 1
