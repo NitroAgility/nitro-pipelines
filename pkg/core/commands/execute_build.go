@@ -48,7 +48,7 @@ echo $NITRO_PIPELINES_TARGET_AWS_REGION
 echo $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws ecr create-repository --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION || true
+aws ecr create-repository --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_TARGET_AWS_REGION --no-cli-pager || true
 # Docker build
 docker build -t {{ .ImageName }}:latest {{ .DockerArgs }} -f {{ .Dockerfile }} .
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
