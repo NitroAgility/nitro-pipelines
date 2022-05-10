@@ -23,17 +23,25 @@ import (
 )
 
 const buildTpl = `#!/bin/bash
+echo step 1
 # Expanding variables
 {{ range .Expand -}}
 echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
+echo step 2
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo step 3
 {{ if eq .Type "environment" -}}
 source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+echo step 4
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo step 5
 rm -f ./{{ .Name -}}.env
+echo step 6
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo step 7
 {{ end -}}
 {{ end -}}
+echo step 8
 # Environment configuration
 aws configure set aws_access_key_id $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi

@@ -9,17 +9,13 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
-echo xxx before
 ./nitro $1 $2
-echo xxx after
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
-    echo xxx 1
     if [ -z "$2" ]; then
         echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
         exit
     else
-        echo xxx 1
         echo $2
         declare script_name="./nitro-$2-build.sh"
         if test -f $script_name; then
