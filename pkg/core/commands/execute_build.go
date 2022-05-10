@@ -49,6 +49,8 @@ aws configure set aws_secret_access_key $NITRO_PIPELINES_TARGET_AWS_SECRET_ACCES
 echo STEP 4
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 echo STEP 5
+echo $NITRO_PIPELINES_TARGET_AWS_REGION
+echo $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 aws ecr get-login-password --region $NITRO_PIPELINES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_TARGET_DOCKER_REGISTRY
 echo STEP 6
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
