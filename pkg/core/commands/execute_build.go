@@ -24,13 +24,16 @@ import (
 
 const buildTpl = `#!/bin/bash
 # Expanding variables
+echo #####----> 1
 {{ range .Expand -}}
 echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo #####----> 2
 {{ if eq .Type "environment" -}}
 source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 rm -f ./{{ .Name -}}.env
+echo #####----> 3
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
