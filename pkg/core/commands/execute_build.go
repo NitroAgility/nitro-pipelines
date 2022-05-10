@@ -32,7 +32,11 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 echo step 3
 {{ if eq .Type "environment" -}}
 [[ ! -f  ./{{ .Name }}.env ]] && exit 1
-source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+if [ -s diff.txt ]; then
+	source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+else
+	echo "File ./{{ .Name }}.env is empty"
+fi
 echo step 4
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 echo step 5
