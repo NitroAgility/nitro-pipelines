@@ -1,9 +1,8 @@
 #!/bin/bash
 eval export CONTEXT_ENV_B64=$NITRO_PIPELINES_ENV_FILE
 filename=$(uuidgen)
-exit 0
-
 echo $CONTEXT_ENV_B64 | base64 --decode >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
+exit 0
 source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
 rm -f ./$filename.env
 if [ -z "$1" ]; then
