@@ -9,7 +9,9 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
+echo 'running nitro'
 ./nitro $1 $2
+echo 'completed nitro'
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
