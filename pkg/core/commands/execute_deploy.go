@@ -74,6 +74,7 @@ docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageNam
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 # EKS Deployment
+KUBECONFIG="$NITROBIN/config"
 aws eks --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_VARIABLES_TARGET_AWS_EKS_CLUSTER_NAME
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Pre deployment
@@ -84,7 +85,7 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Post deployment
 {{ .PostDeployment }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm config
+rm $NITROBIN/config
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
