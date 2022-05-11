@@ -4,7 +4,7 @@ filename=$(uuidgen)
 echo "Starting 2"
 echo $NITRO_PIPELINES_BUILD_ENV_FILE
 echo "Starting 2114"
-echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 --decode >> ./$filename1.tmp
+echo `echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 --decode` >> ./$filename1.tmp
 cat ./$filename1.tmp
 echo "Starting 2115"
 echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 --decode >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env #&& rm ./$filename.tmp
