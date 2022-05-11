@@ -9,10 +9,10 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
     export MACHINE_OS="WIN64"
 fi
 filename=$(uuidgen)
-if [ "$MACHINE_OS" == "OSX" ]; then
+if [ $MACHINE_OS == "OSX" ]; then
     echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 --decode > ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
 else
-    echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 --decode > ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
+    echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 -di > ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
 fi
 if [ -s ./$filename.env  ]; then
 	source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
