@@ -6,7 +6,8 @@ echo "Starting 2"
 echo $CONTEXT_ENV_B64 | base64 --decode >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
 if [ -s ./$filename.env  ]; then
     echo "Starting 3"
-	source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
+    cat ./$filename.env
+	export $(cut -d= -f1 ./$filename.env)
     rm -f ./$filename.env
     echo "Starting 4"
 else
