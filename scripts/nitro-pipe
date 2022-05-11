@@ -1,9 +1,8 @@
 #!/bin/bash
 echo "Starting 1"
-eval export CONTEXT_ENV_B64=$NITRO_PIPELINES_BUILD_ENV_FILE
 filename=$(uuidgen)
 echo "Starting 2"
-echo $CONTEXT_ENV_B64 | base64 --decode >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env #&& rm ./$filename.tmp
+echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 --decode >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env #&& rm ./$filename.tmp
 if [ -s ./$filename.env  ]; then
     echo "Starting 3"
     echo $NITRO_PIPELINES_BUILD_ENV_FILE
