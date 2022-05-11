@@ -38,9 +38,13 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
 source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-#rm -f ./{{ .Name -}}.env
+rm -f ./{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
+source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+rm -f ./{{ .Name -}}.env
+exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 # Environment configuration
 aws configure set aws_access_key_id $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_ACCESS_KEY
