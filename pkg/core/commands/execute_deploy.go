@@ -104,7 +104,7 @@ func ExecuteDeploy(deployCtx *contexts.DeployContext) error {
 	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
 		fmt.Println(buffer.String())
 	} else {
-		if err := saveToFile("/nitro-deploy.sh", buffer.Bytes()); err != nil {
+		if err := saveToFile("./nitro-deploy.sh", buffer.Bytes()); err != nil {
 			return err
 		}
 	}
