@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if [ "$(uname)" == "Darwin" ]; then
     export MACHINE_OS="OSX"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
@@ -26,7 +27,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
-./nitro $1 $2
+$SCRIPT_DIR/nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
