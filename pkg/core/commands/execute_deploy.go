@@ -80,6 +80,7 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Pre deployment
 {{ .PreDeployment }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+echo "$( base64 ./.nitroci/.binaries/thermoking_secrets.env )"
 helm upgrade --install $NITRO_PIPELINES_VARIABLES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_VARIABLES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_VARIABLES_TARGET_HELM_CHART_NAME" --set environment={{ .Environment }} --set infrastructure.docker_registry=$NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER {{ .HelmArgs }} -n $NITRO_PIPELINES_VARIABLES_TARGET_HELM_NAMESPACE
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Post deployment
