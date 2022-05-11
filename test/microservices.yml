@@ -23,4 +23,4 @@ deployments:
       post_deployment: ''
       post_execution:  ''
     helm:
-      parameters: --set env.platform="$(base64 -w 0 /platform.env)"
+      parameters: --set env.platform="$(base64 ./platform.env)"
