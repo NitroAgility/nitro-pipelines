@@ -44,7 +44,7 @@ if [ $1 = "build" ]; then
         fi
     fi
 else
-    script_name="./nitro-deploy.sh"
+    script_name="$SCRIPT_DIR/nitro-deploy.sh"
     if test -f $script_name; then
         source $script_name
     else
