@@ -1,5 +1,5 @@
 #!/bin/bash
-export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export NITROBIN=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if [ "$(uname)" == "Darwin" ]; then
     export MACHINE_OS="OSX"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
@@ -11,15 +11,15 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
 fi
 filename=$(uuidgen)
 if [ $MACHINE_OS == "OSX" ]; then
-    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 --decode > ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
+    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 --decode > $NITROBIN/$filename.tmp && envsubst < $NITROBIN/$filename.tmp > $NITROBIN/$filename.env && rm $NITROBIN/$filename.tmp
 else
-    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 -di > ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
+    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 -di > $NITROBIN/$filename.tmp && envsubst < $NITROBIN/$filename.tmp > $NITROBIN/$filename.env && rm $NITROBIN/$filename.tmp
 fi
-if [ -s ./$filename.env  ]; then
-	source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
-    rm -f ./$filename.env
+if [ -s $NITROBIN/$filename.env  ]; then
+	source $NITROBIN/$filename.env && export $(cut -d= -f1 $NITROBIN/$filename.env)
+    rm -f $NITROBIN/$filename.env
 else
-	echo "File ./$filename.env is empty"
+	echo "File $NITROBIN/$filename.env is empty"
     exit 1
 fi
 if [ -z "$1" ]; then
@@ -27,7 +27,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
-$SCRIPT_DIR/nitro $1 $2
+$NITROBIN/nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
@@ -35,7 +35,7 @@ if [ $1 = "build" ]; then
         exit
     else
         echo $2
-        declare script_name="$SCRIPT_DIR/nitro-$2-build.sh"
+        declare script_name="$NITROBIN/nitro-$2-build.sh"
         if test -f $script_name; then
             source $script_name
         else
@@ -44,7 +44,7 @@ if [ $1 = "build" ]; then
         fi
     fi
 else
-    script_name="$SCRIPT_DIR/nitro-deploy.sh"
+    script_name="$NITROBIN/nitro-deploy.sh"
     if test -f $script_name; then
         source $script_name
     else

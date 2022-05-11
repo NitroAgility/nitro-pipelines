@@ -28,17 +28,17 @@ const buildTpl = `#!/bin/bash
 {{ range .Expand -}}
 filename=$(uuidgen)
 if [ $MACHINE_OS == "OSX" ]; then
-	echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
+	echo ${{ .Variable }} | base64 --decode >> $NITROBIN/{{ .Name }}.tmp && envsubst < $NITROBIN/{{ .Name }}.tmp > $NITROBIN/{{ .Name }}.env && rm $NITROBIN/{{ .Name }}.tmp
 else
-	echo ${{ .Variable }} | base64 -di >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
+	echo ${{ .Variable }} | base64 -di >> $NITROBIN/{{ .Name }}.tmp && envsubst < $NITROBIN/{{ .Name }}.tmp > $NITROBIN/{{ .Name }}.env && rm $NITROBIN/{{ .Name }}.tmp
 fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
-[[ ! -f  ./{{ .Name }}.env ]] && exit 1
-if [ -s ./{{ .Name }}.env ]; then
-	source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
+[[ ! -f  $NITROBIN/{{ .Name }}.env ]] && exit 1
+if [ -s $NITROBIN/{{ .Name }}.env ]; then
+	source $NITROBIN/{{ .Name }}.env && export $(cut -d= -f1 $NITROBIN/{{ .Name }}.env)
 else
-	echo "File ./{{ .Name }}.env is empty"
+	echo "File $NITROBIN/{{ .Name }}.env is empty"
 fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 rm -f ./{{ .Name -}}.env
