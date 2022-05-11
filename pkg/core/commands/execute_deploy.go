@@ -40,7 +40,6 @@ source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 rm -f ./{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-
 {{ end -}}
 {{ end -}}
 # Environment configuration
