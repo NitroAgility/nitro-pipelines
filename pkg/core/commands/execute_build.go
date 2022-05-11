@@ -41,7 +41,7 @@ else
 	echo "File $NITROBIN/{{ .Name }}.env is empty"
 fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm -f ./{{ .Name -}}.env
+rm -f $NITROBIN/{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
@@ -70,7 +70,7 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
-rm -f ./{{ .Name -}}.env
+rm -f $NITROBIN/{{ .Name -}}.env
 {{ end -}}
 {{ end -}}
 `

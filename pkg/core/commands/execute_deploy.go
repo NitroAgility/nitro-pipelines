@@ -39,7 +39,7 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
 source $NITROBIN/{{ .Name }}.env && export $(cut -d= -f1 $NITROBIN/{{ .Name }}.env)
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm -f ./{{ .Name -}}.env
+rm -f $NITROBIN/{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
@@ -88,7 +88,7 @@ rm config
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
-rm -f ./{{ .Name -}}.env
+rm -f $NITROBIN/{{ .Name -}}.env
 {{ end -}}
 {{ end -}}
 # Post execution
