@@ -1,5 +1,9 @@
 #!/bin/bash
 filename=$(uuidgen)
+echo "********************************"
+echo `echo $VARA | base64 --decode`
+echo "********************************"
+exit 1
 echo `echo $VARA | base64 --decode` >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env #&& rm ./$filename.tmp
 if [ -s ./$filename.env  ]; then
     export $(cut -d= -f1 ./$filename.env)
