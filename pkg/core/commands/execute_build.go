@@ -16,6 +16,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -84,7 +85,12 @@ func ExecuteBuild(buildCtx *contexts.BuildContext) error {
 	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
 		fmt.Println(buffer.String())
 	} else {
-		fileName := fmt.Sprintf("./nitro-%s-build.sh", buildCtx.Name)
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		exPath := filepath.Dir(ex)
+		fileName := fmt.Sprintf(exPath + "/nitro-%s-build.sh", buildCtx.Name)
 		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
 			return err
 		}

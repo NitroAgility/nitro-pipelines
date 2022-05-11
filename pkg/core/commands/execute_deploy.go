@@ -16,6 +16,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -104,7 +105,12 @@ func ExecuteDeploy(deployCtx *contexts.DeployContext) error {
 	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
 		fmt.Println(buffer.String())
 	} else {
-		if err := saveToFile("./nitro-deploy.sh", buffer.Bytes()); err != nil {
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		exPath := filepath.Dir(ex)
+		if err := saveToFile(exPath + "/nitro-deploy.sh", buffer.Bytes()); err != nil {
 			return err
 		}
 	}

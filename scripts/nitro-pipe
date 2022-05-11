@@ -1,5 +1,5 @@
 #!/bin/bash
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if [ "$(uname)" == "Darwin" ]; then
     export MACHINE_OS="OSX"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
