@@ -1,16 +1,13 @@
 #!/bin/bash
-echo "Starting 1"
 filename=$(uuidgen)
 echo `echo $VARA | base64 --decode` >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env #&& rm ./$filename.tmp
 cat ./$filename.tmp
 if [ -s ./$filename.env  ]; then
-    echo "Starting 3"
     echo $NITRO_PIPELINES_BUILD_ENV_FILE
     cat ./$filename.tmp
 	export $(cut -d= -f1 ./$filename.env)
     exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
     rm -f ./$filename.env
-    echo "Starting 4"
 else
 	echo "File ./$filename.env is empty"
     exit 1
@@ -20,7 +17,6 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
-echo "Starting 5"
 ./nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
