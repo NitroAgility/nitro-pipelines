@@ -28,7 +28,7 @@ const DeployTpl = `#!/bin/bash
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Expanding variables
 {{ range .Expand -}}
-echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
+echo ${{ .Variable }} | base64 -di >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
 source ./{{ .Name }}.env && export $(cut -d= -f1 ./{{ .Name }}.env)
@@ -89,11 +89,11 @@ rm -f ./{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 `
 
-func ExecuteDeploy(deployCtx *contexts.DeployContext) (error) {
-    tmpl, _ :=  template.New("DEPLOY").Parse(DeployTpl)
+func ExecuteDeploy(deployCtx *contexts.DeployContext) error {
+	tmpl, _ := template.New("DEPLOY").Parse(DeployTpl)
 	var buffer bytes.Buffer
 	if err := tmpl.Execute(&buffer, deployCtx); err != nil {
-        fmt.Print(buffer.String())
+		fmt.Print(buffer.String())
 		return err
 	}
 	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
@@ -103,5 +103,5 @@ func ExecuteDeploy(deployCtx *contexts.DeployContext) (error) {
 			return err
 		}
 	}
-    return nil
+	return nil
 }

@@ -25,7 +25,7 @@ import (
 const buildTpl = `#!/bin/bash
 # Expanding variables
 {{ range .Expand -}}
-echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
+echo ${{ .Variable }} | base64 -di >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
 [[ ! -f  ./{{ .Name }}.env ]] && exit 1
@@ -69,20 +69,20 @@ rm -f ./{{ .Name -}}.env
 {{ end -}}
 `
 
-func ExecuteBuild(buildCtx *contexts.BuildContext) (error) {
-    tmpl, _ :=  template.New("BUILD").Parse(buildTpl)
+func ExecuteBuild(buildCtx *contexts.BuildContext) error {
+	tmpl, _ := template.New("BUILD").Parse(buildTpl)
 	var buffer bytes.Buffer
 	if err := tmpl.Execute(&buffer, buildCtx); err != nil {
-        fmt.Print(buffer.String())
+		fmt.Print(buffer.String())
 		return err
 	}
 	if strings.ToUpper(os.Getenv("DRY_RUN")) == "TRUE" {
 		fmt.Println(buffer.String())
 	} else {
-		fileName := fmt.Sprintf("./nitro-%s-build.sh",buildCtx.Name)
+		fileName := fmt.Sprintf("./nitro-%s-build.sh", buildCtx.Name)
 		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
 			return err
 		}
 	}
-    return nil
+	return nil
 }

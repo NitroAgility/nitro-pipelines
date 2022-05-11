@@ -1,28 +1,8 @@
 #!/bin/bash
 filename=$(uuidgen)
-echo "********************************"
-echo $NITRO_PIPELINES_ENV_FILE
-echo "********************************"
-echo "********************************"
-echo `echo $NITRO_PIPELINES_ENV_FILE | base64 --decode`
-echo "********************************"
-exit 1
-echo `echo $NITRO_PIPELINES_ENV_FILE | base64 --decode` >> ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env #&& rm ./$filename.tmp
+echo $NITRO_PIPELINES_BUILD_ENV_FILE | base64 -di > ./$filename.tmp && envsubst < ./$filename.tmp > ./$filename.env && rm ./$filename.tmp
 if [ -s ./$filename.env  ]; then
-    export $(cut -d= -f1 ./$filename.env)
-    exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-    echo "********************************"
-    echo `echo $NITRO_PIPELINES_ENV_FILE | base64 --decode`
-    echo "********************************"
-    echo "********************************"
-    cat ./$filename.tmp
-    echo "********************************"
-    echo "********************************"
-    cat ./$filename.env
-    echo "********************************"
-    echo $NITRO_PIPELINES_TARGET_AWS_REGION
-    echo $NITRO_PIPELINES_TARGET_AWS_ACCESS_KEY
-    echo "********************************"
+	source ./$filename.env && export $(cut -d= -f1 ./$filename.env)
     rm -f ./$filename.env
 else
 	echo "File ./$filename.env is empty"
