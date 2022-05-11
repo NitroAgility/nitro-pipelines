@@ -1,6 +1,9 @@
 #!/bin/bash
 filename=$(uuidgen)
 echo "********************************"
+echo $NITRO_PIPELINES_ENV_FILE
+echo "********************************"
+echo "********************************"
 echo `echo $NITRO_PIPELINES_ENV_FILE | base64 --decode`
 echo "********************************"
 exit 1
