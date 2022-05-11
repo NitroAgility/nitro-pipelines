@@ -45,26 +45,26 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
 # Environment configuration
-aws configure set aws_access_key_id $ NITRO_PIPELINES_VARIABLES_TARGET_AWS_ACCESS_KEY
+aws configure set aws_access_key_id $NITRO_PIPELINES_VARIABLES_TARGET_AWS_ACCESS_KEY
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws configure set aws_secret_access_key $ NITRO_PIPELINES_VARIABLES_TARGET_AWS_SECRET_ACCESS
+aws configure set aws_secret_access_key $NITRO_PIPELINES_VARIABLES_TARGET_AWS_SECRET_ACCESS
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-echo $ NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION
-echo $ NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY
-aws ecr get-login-password --region $ NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $ NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY
+echo $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION
+echo $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY
+aws ecr get-login-password --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws ecr create-repository --no-cli-pager --repository-name {{ .ImageName }} --region $ NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION || true
+aws ecr create-repository --no-cli-pager --repository-name {{ .ImageName }} --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION || true
 # Docker build
 docker build -t {{ .ImageName }}:latest {{ .DockerArgs }} -f {{ .Dockerfile }} .
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Docker push
-docker tag {{ .ImageName }}:latest $ NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker push $ NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
+docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker tag {{ .ImageName }}:latest $ NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker push $ NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Cleaning expanded variables
 {{ range .Expand -}}
