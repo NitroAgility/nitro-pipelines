@@ -5,6 +5,9 @@ if [ -s ./$filename.env  ]; then
     export $(cut -d= -f1 ./$filename.env)
     exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
     echo "********************************"
+    echo `echo $VARA | base64 --decode`
+    echo "********************************"
+    echo "********************************"
     cat ./$filename.tmp
     echo "********************************"
     echo "********************************"
