@@ -28,7 +28,7 @@ const DeployTpl = `#!/bin/bash
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Expanding variables
 {{ range .Expand -}}
-if [ "$(MACHINE_OS)" == "OSX" ]; then
+if [ "$MACHINE_OS" == "OSX" ]; then
 	echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
 else
 	echo ${{ .Variable }} | base64 -di >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp

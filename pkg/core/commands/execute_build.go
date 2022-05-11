@@ -25,7 +25,7 @@ import (
 const buildTpl = `#!/bin/bash
 # Expanding variables
 {{ range .Expand -}}
-if [ "$(MACHINE_OS)" == "OSX" ]; then
+if [ "$MACHINE_OS" == "OSX" ]; then
 	echo ${{ .Variable }} | base64 --decode >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
 else
 	echo ${{ .Variable }} | base64 -di >> ./{{ .Name }}.tmp && envsubst < ./{{ .Name }}.tmp > ./{{ .Name }}.env && rm ./{{ .Name }}.tmp
