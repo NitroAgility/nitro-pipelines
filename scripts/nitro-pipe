@@ -35,7 +35,7 @@ if [ $1 = "build" ]; then
         exit
     else
         echo $2
-        declare script_name="./nitro-$2-build.sh"
+        declare script_name="$SCRIPT_DIR/nitro-$2-build.sh"
         if test -f $script_name; then
             source $script_name
         else
