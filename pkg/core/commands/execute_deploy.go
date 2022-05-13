@@ -24,6 +24,10 @@ import (
 )
 
 const DeployTpl = `#!/bin/bash
+# Configure local files
+export KUBECONFIG="$NITROBIN/kube_config"
+export AWS_CONFIG_FILE="$NITROBIN/aws_config"
+export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/aws_credentials"
 # Pre execution
 {{ .PreExecution }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
@@ -74,7 +78,6 @@ docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageNam
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 # EKS Deployment
-export KUBECONFIG="$NITROBIN/config"
 aws eks --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_VARIABLES_TARGET_AWS_EKS_CLUSTER_NAME
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Pre deployment
@@ -85,7 +88,9 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Post deployment
 {{ .PostDeployment }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm $NITROBIN/config
+rm "$NITROBIN/aws_credentials"
+rm "$NITROBIN/aws_config"
+rm "$NITROBIN/kube_config"
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
