@@ -25,15 +25,9 @@ import (
 
 const DeployTpl = `#!/bin/bash
 # Configure local files
-export KUBECONFIG="./kube_config"
-export AWS_CONFIG_FILE="./aws_config"
-export AWS_SHARED_CREDENTIALS_FILE="./aws_credentials"
-touch $KUBECONFIG
-chmod 777 $KUBECONFIG
-touch $AWS_CONFIG_FILE
-chmod 777 $AWS_CONFIG_FILE
-touch $AWS_SHARED_CREDENTIALS_FILE
-chmod 777 $AWS_SHARED_CREDENTIALS_FILE
+export KUBECONFIG=./kube_config
+export AWS_CONFIG_FILE=./aws_config
+export AWS_SHARED_CREDENTIALS_FILE=./aws_credentials
 # Pre execution
 {{ .PreExecution }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
@@ -94,9 +88,6 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Post deployment
 {{ .PostDeployment }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm "$NITROBIN/aws_credentials"
-rm "$NITROBIN/aws_config"
-rm "$NITROBIN/kube_config"
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
