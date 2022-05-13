@@ -27,6 +27,8 @@ const buildTpl = `#!/bin/bash
 # Configure local files
 export AWS_CONFIG_FILE="$NITROBIN/aws_config"
 export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/aws_credentials"
+touch $AWS_CONFIG_FILE
+touch $AWS_SHARED_CREDENTIALS_FILE
 # Expanding variables
 {{ range .Expand -}}
 filename=$(uuidgen)

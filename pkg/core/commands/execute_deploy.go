@@ -28,6 +28,9 @@ const DeployTpl = `#!/bin/bash
 export KUBECONFIG="$NITROBIN/kube_config"
 export AWS_CONFIG_FILE="$NITROBIN/aws_config"
 export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/aws_credentials"
+touch $KUBECONFIG
+touch $AWS_CONFIG_FILE
+touch $AWS_SHARED_CREDENTIALS_FILE
 # Pre execution
 {{ .PreExecution }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
