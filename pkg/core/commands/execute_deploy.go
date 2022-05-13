@@ -91,9 +91,9 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Post deployment
 {{ .PostDeployment }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm "$NITROBIN/aws_credentials"
-rm "$NITROBIN/aws_config"
-rm "$NITROBIN/kube_config"
+#rm "$NITROBIN/aws_credentials"
+#rm "$NITROBIN/aws_config"
+#rm "$NITROBIN/kube_config"
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
