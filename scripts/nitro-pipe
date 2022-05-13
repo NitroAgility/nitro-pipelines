@@ -30,12 +30,6 @@ cwd=$(dirname "$0")
 $NITROBIN/nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
-    export KUBECONFIG="$NITROBIN/kube_config"
-    export AWS_CONFIG_FILE="$NITROBIN/aws_config"
-    export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/aws_credentials"
-    touch $KUBECONFIG
-    touch $AWS_CONFIG_FILE
-    touch $AWS_SHARED_CREDENTIALS_FILE
     if [ -z "$2" ]; then
         echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
         exit
