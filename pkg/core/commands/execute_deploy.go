@@ -29,8 +29,11 @@ export KUBECONFIG="./kube_config"
 export AWS_CONFIG_FILE="./aws_config"
 export AWS_SHARED_CREDENTIALS_FILE="./aws_credentials"
 touch $KUBECONFIG
+chmod 777 $KUBECONFIG
 touch $AWS_CONFIG_FILE
+chmod 777 $AWS_CONFIG_FILE
 touch $AWS_SHARED_CREDENTIALS_FILE
+chmod 777 $AWS_SHARED_CREDENTIALS_FILE
 # Pre execution
 {{ .PreExecution }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
