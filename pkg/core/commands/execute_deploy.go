@@ -85,9 +85,9 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 helm upgrade --install $NITRO_PIPELINES_VARIABLES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_VARIABLES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_VARIABLES_TARGET_HELM_CHART_NAME" --set environment={{ .Environment }} --set infrastructure.docker_registry=$NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER {{ .HelmArgs }} -n $NITRO_PIPELINES_VARIABLES_TARGET_HELM_NAMESPACE
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm ./kube_config
-rm ./aws_config
-rm ./aws_credentials
+rm -f ./kube_config
+rm -f ./aws_config
+rm -f ./aws_credentials
 # Post deployment
 {{ .PostDeployment }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
