@@ -72,8 +72,8 @@ docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGI
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-#rm "$NITROBIN/aws_credentials"
-#rm "$NITROBIN/aws_config"
+rm "$NITROBIN/aws_credentials"
+rm "$NITROBIN/aws_config"
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
