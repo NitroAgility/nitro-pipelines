@@ -25,9 +25,9 @@ import (
 
 const DeployTpl = `#!/bin/bash
 # Configure local files
-export KUBECONFIG="$NITROBIN/kube_config"
-export AWS_CONFIG_FILE="$NITROBIN/aws_config"
-export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/aws_credentials"
+export KUBECONFIG="./kube_config"
+export AWS_CONFIG_FILE="./aws_config"
+export AWS_SHARED_CREDENTIALS_FILE="./aws_credentials"
 touch $KUBECONFIG
 touch $AWS_CONFIG_FILE
 touch $AWS_SHARED_CREDENTIALS_FILE
