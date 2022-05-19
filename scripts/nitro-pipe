@@ -34,8 +34,20 @@ if [ $1 = "build" ]; then
         echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
         exit
     else
-        echo $2
         declare script_name="$NITROBIN/nitro-$2-build.sh"
+        if test -f $script_name; then
+            source $script_name
+        else
+            $script_name = dx
+            echo "File $script_name doesn't exists."
+        fi
+    fi
+elif [ $1 = "promotion" ]; then
+    if [ -z "$2" ]; then
+        echo "No required arguments supplied (operation=any|build|promotion|deploy, ms_name)."
+        exit
+    else
+        declare script_name="$NITROBIN/nitro-$2-promotion.sh"
         if test -f $script_name; then
             source $script_name
         else
