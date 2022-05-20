@@ -18,9 +18,11 @@ deployments:
         name: platform
         type: file
     scripts:
-      pre_execution: ''
-      pre_deployment: ''
-      post_deployment: ''
-      post_execution:  ''
+      pre_execution: '#CODE: PRE EXECUTION'
+      pre_promotion: '#CODE: PRE PROMOTION'
+      post_promotion: '#CODE: POST PROMOTION'
+      pre_deployment: '#CODE: PRE DEPLOYMENT'
+      post_deployment: '#CODE: POST DEPLOYMENT'
+      post_execution: '#CODE: POST EXECUTION'
     helm:
       parameters: --set env.platform="$(base64 ./platform.env)"

@@ -18,30 +18,32 @@ import (
 	"strings"
 )
 
-type DeployExpandContext struct {
+type PromotionExpandContext struct {
 	Variable string
 	Type	string
 	Name	string
 }
 
-type DeployImageContext struct {
+type PromotionImageContext struct {
+	Name			string
 	SourceImageName string
 	TargetImageName	string
 }
 
-type DeployContext struct {
+type PromotionContext struct {
+	Name			string
 	Environment 	string
 	PreExecution	string
 	PostExecution	string
-	PreDeployment	string
-	PostDeployment	string
-	Expand			[]DeployExpandContext
-	HelmArgs		string
+	PrePromotion	string
+	PostPromotion	string
+	Expand			[]PromotionExpandContext
+	Images			[]PromotionImageContext
 }
 
 // Creational functions
 
-func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
+func NewPromotionContext(microservicesFile string, name string)  (*PromotionContext, error) {
 	msModel, err := loadMicroservicesFile(microservicesFile)
 	if err != nil {
 		return nil, err
@@ -54,21 +56,31 @@ func NewDeployContext(microservicesFile string)  (*DeployContext, error) {
 	if len(envSource) == 0 {
 		envSource = "BUILD"
 	}
-	context := &DeployContext {
+	context := &PromotionContext {
+		Name			: name,
 		Environment 	: strings.ToLower(os.Getenv("ENV_TARGET")),
 		PreExecution	: buildScript(msModel.Deployments.Default.Scripts.PreExecution),
 		PostExecution	: buildScript(msModel.Deployments.Default.Scripts.PostExecution),
-		PreDeployment	: buildScript(msModel.Deployments.Default.Scripts.PreDeployment),
-		PostDeployment	: buildScript(msModel.Deployments.Default.Scripts.PostDeployment),
-		Expand			: []DeployExpandContext{},
-		HelmArgs		: msModel.Deployments.Default.Helm.Parameters,
+		PrePromotion	: buildScript(msModel.Deployments.Default.Scripts.PrePromotion),
+		PostPromotion	: buildScript(msModel.Deployments.Default.Scripts.PostPromotion),
+		Expand			: []PromotionExpandContext{},
+		Images			: []PromotionImageContext{},
 	}
 	for _, e := range msModel.Deployments.Default.Expand {
-		expCtx := DeployExpandContext {}
+		expCtx := PromotionExpandContext {}
 		expCtx.Variable = e.Variable
 		expCtx.Type 	= e.Type
 		expCtx.Name 	= buildFileName(e.Name)
 		context.Expand	= append(context.Expand, expCtx)
+	}
+	for _, m := range msModel.Microservices {
+		if name == "" || m.Name == name {
+			msCtx := PromotionImageContext {}
+			msCtx.Name				= m.Name
+			msCtx.SourceImageName 	= buildImageName(m.Name, envSource)
+			msCtx.TargetImageName 	= buildImageName(m.Name, envTarget)
+			context.Images			= append(context.Images, msCtx)
+		}
 	}
 	return context, nil
 }

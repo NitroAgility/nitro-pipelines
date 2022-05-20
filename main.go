@@ -38,19 +38,25 @@ func main() {
 				commands.ExecuteBuild(buildCtx)
 				return
 			}
-		} else if strings.ToUpper(os.Args[1]) == "PROMOTION" || strings.ToUpper(os.Args[1]) == "DEPLOY" { 
+		} else if strings.ToUpper(os.Args[1]) == "PROMOTION"  { 
+			if len(os.Args) > 2 {
+				promotionCtx, err := contexts.NewPromotionContext(msFilePath, os.Args[2])
+				if err != nil {
+					fmt.Println("An error has occurred whilst executing the command, ", err)
+					os.Exit(1)
+				}
+				commands.ExecutePromotion(promotionCtx)
+				return
+			}
+		} else if strings.ToUpper(os.Args[1]) == "DEPLOY" { 
 			deployCtx, err := contexts.NewDeployContext(msFilePath)
 			if err != nil {
 				fmt.Println("An error has occurred whilst executing the command, ", err)
 				os.Exit(1)
 			}
-			if strings.ToUpper(os.Args[1]) == "PROMOTION" {
-				commands.ExecutePromotion(deployCtx)
-			} else {
-				commands.ExecuteDeploy(deployCtx)
-			}
+			commands.ExecuteDeploy(deployCtx)
 			return
-		}	
+		}
 	}
 	fmt.Println("Invalid command.")
 	os.Exit(1)

@@ -25,7 +25,6 @@ import (
 
 const PromotionTpl = `#!/bin/bash
 # Configure local files
-export KUBECONFIG=$NITROBIN/kube_config
 export AWS_CONFIG_FILE=$NITROBIN/aws_config
 export AWS_SHARED_CREDENTIALS_FILE=$NITROBIN/aws_credentials
 # Pre execution
@@ -54,6 +53,9 @@ aws configure set aws_secret_access_key $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_SE
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 aws ecr get-login-password --region $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
+# Pre promotion
+{{ .PrePromotion }}
+exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Pull docker images
 {{ range .Images -}}
 docker pull $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
@@ -77,19 +79,8 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:latest
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
-# EKS Deployment
-aws eks --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_VARIABLES_TARGET_AWS_EKS_CLUSTER_NAME
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-# Pre deployment
-{{ .PreDeployment }}
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-helm upgrade --install $NITRO_PIPELINES_VARIABLES_TARGET_HELM_RELEASE_NAME "$NITRO_PIPELINES_VARIABLES_TARGET_HELM_CHART_CODE_PATH/chart/$NITRO_PIPELINES_VARIABLES_TARGET_HELM_CHART_NAME" --set environment={{ .Environment }} --set infrastructure.docker_registry=$NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY --set app.tag=$NITRO_PIPELINES_BUILD_NUMBER {{ .HelmArgs }} -n $NITRO_PIPELINES_VARIABLES_TARGET_HELM_NAMESPACE
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm -f ./kube_config
-rm -f ./aws_config
-rm -f ./aws_credentials
-# Post deployment
-{{ .PostDeployment }}
+# Post promotion
+{{ .PostPromotion }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Cleaning expanded variables
 {{ range .Expand -}}
@@ -102,10 +93,10 @@ rm -f $NITROBIN/{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 `
 
-func ExecutePromotion(deployCtx *contexts.DeployContext) error {
+func ExecutePromotion(promotionCtx *contexts.PromotionContext) error {
 	tmpl, _ := template.New("PROMOTION").Parse(PromotionTpl)
 	var buffer bytes.Buffer
-	if err := tmpl.Execute(&buffer, deployCtx); err != nil {
+	if err := tmpl.Execute(&buffer, promotionCtx); err != nil {
 		fmt.Print(buffer.String())
 		return err
 	}
@@ -117,7 +108,12 @@ func ExecutePromotion(deployCtx *contexts.DeployContext) error {
 			panic(err)
 		}
 		exPath := filepath.Dir(ex)
-		if err := saveToFile(exPath + "/nitro-promotion.sh", buffer.Bytes()); err != nil {
+		scriptsFoder := os.Getenv("NITRO_PIPELINES_SCRIPTS_FOLDER")
+		if scriptsFoder != "" {
+			exPath = scriptsFoder
+		}
+		fileName := fmt.Sprintf(exPath + "/nitro-%s-promotion.sh", promotionCtx.Name)
+		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
 			return err
 		}
 	}

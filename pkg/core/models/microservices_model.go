@@ -33,6 +33,8 @@ type Build struct {
 }
 type DeploymentScripts struct {
 	PreExecution   string `yaml:"pre_execution"`
+	PrePromotion   string `yaml:"pre_promotion"`
+	PostPromotion  string `yaml:"post_promotion"`
 	PreDeployment  string `yaml:"pre_deployment"`
 	PostDeployment string `yaml:"post_deployment"`
 	PostExecution  string `yaml:"post_execution"`

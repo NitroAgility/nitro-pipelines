@@ -52,31 +52,6 @@ aws configure set aws_access_key_id $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_ACCESS
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 aws configure set aws_secret_access_key $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_SECRET_ACCESS
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws ecr get-login-password --region $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-# Pull docker images
-{{ range .Images -}}
-docker pull $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-{{ end -}}
-# Push docker images
-aws configure set aws_access_key_id $NITRO_PIPELINES_VARIABLES_TARGET_AWS_ACCESS_KEY
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws configure set aws_secret_access_key $NITRO_PIPELINES_VARIABLES_TARGET_AWS_SECRET_ACCESS
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws ecr get-login-password --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION | docker login --username AWS --password-stdin $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-{{ range .Images -}}
-aws ecr create-repository --no-cli-pager --repository-name {{ .TargetImageName }} --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION || true
-docker tag $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker tag $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }}:$NITRO_PIPELINES_BUILD_NUMBER $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:latest
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }}:latest
-exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-{{ end -}}
 # EKS Deployment
 aws eks --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_VARIABLES_TARGET_AWS_EKS_CLUSTER_NAME
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
@@ -117,6 +92,10 @@ func ExecuteDeploy(deployCtx *contexts.DeployContext) error {
 			panic(err)
 		}
 		exPath := filepath.Dir(ex)
+		scriptsFoder := os.Getenv("NITRO_PIPELINES_SCRIPTS_FOLDER")
+		if scriptsFoder != "" {
+			exPath = scriptsFoder
+		}
 		if err := saveToFile(exPath + "/nitro-deploy.sh", buffer.Bytes()); err != nil {
 			return err
 		}

@@ -95,6 +95,10 @@ func ExecuteBuild(buildCtx *contexts.BuildContext) error {
 			panic(err)
 		}
 		exPath := filepath.Dir(ex)
+		scriptsFoder := os.Getenv("NITRO_PIPELINES_SCRIPTS_FOLDER")
+		if scriptsFoder != "" {
+			exPath = scriptsFoder
+		}
 		fileName := fmt.Sprintf(exPath + "/nitro-%s-build.sh", buildCtx.Name)
 		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
 			return err
