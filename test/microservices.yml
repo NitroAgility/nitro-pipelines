@@ -1,9 +1,9 @@
 # applicative microservices
 microservices:
   - name: p24-next-telegram-bot
-    dockerfile: ./microservices/p24_next_telegram_bot/Dockerfile
+    dockerfile: ./microservices/nitro_pipelines_app1/Dockerfile
   - name: p24-next-platform-api
-    dockerfile: ./microservices/p24_next_platform/api/Dockerfile
+    dockerfile: ./microservices/nitro_pipelines_app2/api/Dockerfile
 build:
   build_args: ''
   expand:
