@@ -38,7 +38,7 @@ func main() {
 				commands.ExecuteBuild(buildCtx)
 				return
 			}
-		} else if strings.ToUpper(os.Args[1]) == "PROMOTION"  { 
+		} else if strings.ToUpper(os.Args[1]) == "PROMOTE"  { 
 			if len(os.Args) > 2 {
 				promotionCtx, err := contexts.NewPromotionContext(msFilePath, os.Args[2])
 				if err != nil {

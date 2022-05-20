@@ -112,7 +112,7 @@ func ExecutePromotion(promotionCtx *contexts.PromotionContext) error {
 		if scriptsFoder != "" {
 			exPath = scriptsFoder
 		}
-		fileName := fmt.Sprintf(exPath + "/nitro-%s-promotion.sh", promotionCtx.Name)
+		fileName := fmt.Sprintf(exPath + "/nitro-%s-promote.sh", promotionCtx.Name)
 		if err := saveToFile(fileName, buffer.Bytes()); err != nil {
 			return err
 		}

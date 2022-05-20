@@ -31,7 +31,7 @@ $NITROBIN/nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
-        echo "No required arguments supplied (operation=any|build|deploy, ms_name)."
+        echo "No required arguments supplied (operation=any|build|promote|deploy, ms_name)."
         exit
     else
         declare script_name="$NITROBIN/nitro-$2-build.sh"
@@ -42,12 +42,12 @@ if [ $1 = "build" ]; then
             echo "File $script_name doesn't exists."
         fi
     fi
-elif [ $1 = "promotion" ]; then
+elif [ $1 = "promote" ]; then
     if [ -z "$2" ]; then
-        echo "No required arguments supplied (operation=any|build|promotion|deploy, ms_name)."
+        echo "No required arguments supplied (operation=any|build|promote|deploy, ms_name)."
         exit
     else
-        declare script_name="$NITROBIN/nitro-$2-promotion.sh"
+        declare script_name="$NITROBIN/nitro-$2-promote.sh"
         if test -f $script_name; then
             source $script_name
         else
