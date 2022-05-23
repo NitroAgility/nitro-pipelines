@@ -25,26 +25,26 @@ import (
 
 const buildTpl = `#!/bin/bash
 # Configure local files
-export AWS_CONFIG_FILE="$NITROBIN/"aws_config
-export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/"aws_credentials
+export AWS_CONFIG_FILE="$NITROBIN"aws_config
+export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN"aws_credentials
 # Expanding variables
 {{ range .Expand -}}
 filename=$(uuidgen)
 if [ $MACHINE_OS == "OSX" ]; then
-	echo ${{ .Variable }} | base64 --decode >> "$NITROBIN/"{{ .Name }}.tmp && envsubst < "$NITROBIN/"{{ .Name }}.tmp > "$NITROBIN/"{{ .Name }}.env && rm "$NITROBIN/"{{ .Name }}.tmp
+	echo ${{ .Variable }} | base64 --decode >> "$NITROBIN"{{ .Name }}.tmp && envsubst < "$NITROBIN"{{ .Name }}.tmp > "$NITROBIN"{{ .Name }}.env && rm "$NITROBIN"{{ .Name }}.tmp
 else
-	echo ${{ .Variable }} | base64 -di >> "$NITROBIN/"{{ .Name }}.tmp && envsubst < "$NITROBIN/"{{ .Name }}.tmp > "$NITROBIN/"{{ .Name }}.env && rm "$NITROBIN/"{{ .Name }}.tmp
+	echo ${{ .Variable }} | base64 -di >> "$NITROBIN"{{ .Name }}.tmp && envsubst < "$NITROBIN"{{ .Name }}.tmp > "$NITROBIN"{{ .Name }}.env && rm "$NITROBIN"{{ .Name }}.tmp
 fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
-[[ ! -f  "$NITROBIN/"{{ .Name }}.env ]] && exit 1
-if [ -s "$NITROBIN/"{{ .Name }}.env ]; then
-	source "$NITROBIN/"{{ .Name }}.env && export $(cut -d= -f1 "$NITROBIN/"{{ .Name }}.env)
+[[ ! -f  "$NITROBIN"{{ .Name }}.env ]] && exit 1
+if [ -s "$NITROBIN"{{ .Name }}.env ]; then
+	source "$NITROBIN"{{ .Name }}.env && export $(cut -d= -f1 "$NITROBIN"{{ .Name }}.env)
 else
-	echo "File "$NITROBIN/"{{ .Name }}.env is empty"
+	echo "File "$NITROBIN"{{ .Name }}.env is empty"
 fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm -f "$NITROBIN/"{{ .Name -}}.env
+rm -f "$NITROBIN"{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
@@ -75,7 +75,7 @@ rm -f ./aws_credentials
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
-rm -f "$NITROBIN/"{{ .Name -}}.env
+rm -f "$NITROBIN"{{ .Name -}}.env
 {{ end -}}
 {{ end -}}
 `

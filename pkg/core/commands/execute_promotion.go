@@ -25,8 +25,8 @@ import (
 
 const PromotionTpl = `#!/bin/bash
 # Configure local files
-export AWS_CONFIG_FILE="$NITROBIN/"aws_config
-export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN/"aws_credentials
+export AWS_CONFIG_FILE="$NITROBIN"aws_config
+export AWS_SHARED_CREDENTIALS_FILE="$NITROBIN"aws_credentials
 # Pre execution
 {{ .PreExecution }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
@@ -34,15 +34,15 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ range .Expand -}}
 filename=$(uuidgen)
 if [ $MACHINE_OS == "OSX" ]; then
-	echo ${{ .Variable }} | base64 --decode >> "$NITROBIN/"{{ .Name }}.tmp && envsubst < "$NITROBIN/"{{ .Name }}.tmp > "$NITROBIN/"{{ .Name }}.env && rm "$NITROBIN/"{{ .Name }}.tmp
+	echo ${{ .Variable }} | base64 --decode >> "$NITROBIN"{{ .Name }}.tmp && envsubst < "$NITROBIN"{{ .Name }}.tmp > "$NITROBIN"{{ .Name }}.env && rm "$NITROBIN"{{ .Name }}.tmp
 else
-	echo ${{ .Variable }} | base64 -di >> "$NITROBIN/"{{ .Name }}.tmp && envsubst < "$NITROBIN/"{{ .Name }}.tmp > "$NITROBIN/"{{ .Name }}.env && rm "$NITROBIN/"{{ .Name }}.tmp
+	echo ${{ .Variable }} | base64 -di >> "$NITROBIN"{{ .Name }}.tmp && envsubst < "$NITROBIN"{{ .Name }}.tmp > "$NITROBIN"{{ .Name }}.env && rm "$NITROBIN"{{ .Name }}.tmp
 fi
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ if eq .Type "environment" -}}
-source "$NITROBIN/"{{ .Name }}.env && export $(cut -d= -f1 "$NITROBIN/"{{ .Name }}.env)
+source "$NITROBIN"{{ .Name }}.env && export $(cut -d= -f1 "$NITROBIN"{{ .Name }}.env)
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-rm -f "$NITROBIN/"{{ .Name -}}.env
+rm -f "$NITROBIN"{{ .Name -}}.env
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
@@ -85,7 +85,7 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # Cleaning expanded variables
 {{ range .Expand -}}
 {{ if eq .Type "file" -}}
-rm -f "$NITROBIN/"{{ .Name -}}.env
+rm -f "$NITROBIN"{{ .Name -}}.env
 {{ end -}}
 {{ end -}}
 # Post execution
