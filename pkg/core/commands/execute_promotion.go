@@ -59,8 +59,8 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{if eq .Strategy "retag" -}}
 #Retagging an image
 {{ range .Images -}}
-MANIFEST=$(aws ecr batch-get-image --repository-name $NITRO_PIPELINES_VARIABLES_SOURCE_DOCKER_REGISTRY/{{ .SourceImageName }} --image-ids imageTag=$NITRO_PIPELINES_BUILD_NUMBER --output json | jq --raw-output --join-output '.images[0].imageManifest')
-aws ecr put-image --repository-name $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .TargetImageName }} --image-tag $NITRO_PIPELINES_BUILD_NUMBER --image-manifest "$MANIFEST"
+MANIFEST=$(aws ecr batch-get-image --repository-name {{ .SourceImageName }} --image-ids imageTag=$NITRO_PIPELINES_BUILD_NUMBER --output json | jq --raw-output --join-output '.images[0].imageManifest')
+aws ecr put-image --repository-name {{ .TargetImageName }} --image-tag $NITRO_PIPELINES_BUILD_NUMBER --image-manifest "$MANIFEST"
 {{ end -}}
 {{end}}
 {{if eq .Strategy "push"}}

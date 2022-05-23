@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "./main.go",
-            "args": [ "promote", "p24-next-telegram-bot"],
+            "args": [ "promote", "sample-app1"],
             "env": {
                 "ENV": "DEV",
                 "ENV_TARGET": "DEV",

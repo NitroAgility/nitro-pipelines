@@ -2,15 +2,15 @@
 settings:
   environments:
     dev:
-      promotion_strategy: 'push'
+      promotion_strategy: 'retag'
     uat:
       promotion_strategy: 'retag'
     prod:
       promotion_strategy: 'push'
 microservices:
-  - name: sample-telegram-bot
+  - name: sample-app1
     dockerfile: ./microservices/nitro_pipelines_app1/Dockerfile
-  - name: sample-platform-api
+  - name: sample-app2
     dockerfile: ./microservices/nitro_pipelines_app2/api/Dockerfile
 build:
   build_args: ''
