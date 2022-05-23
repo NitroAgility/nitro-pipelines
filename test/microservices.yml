@@ -1,4 +1,12 @@
 # applicative microservices
+settings:
+  environments:
+    dev:
+      promotion_strategy: 'retag'
+    uat:
+      promotion_strategy: 'retag'
+    prod:
+      promotion_strategy: 'push'
 microservices:
   - name: p24-next-telegram-bot
     dockerfile: ./microservices/nitro_pipelines_app1/Dockerfile

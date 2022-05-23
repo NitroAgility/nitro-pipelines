@@ -13,10 +13,19 @@ limitations under the License.
 package models
 
 type MicroservicesModel struct {
+	Settings	  Setting `yaml:"settings"`
 	Microservices []Microservices `yaml:"microservices"`
 	Build         Build           `yaml:"build"`
 	Deployments   Deployments     `yaml:"deployments"`
 }
+type Setting struct {
+	Environment map[string]EnvironemntSetting `yaml:"environments"`
+}
+
+type EnvironemntSetting struct {
+	PromotionStrategy	string `yaml:"promotion_strategy"`
+}
+
 type Microservices struct {
 	Name       string `yaml:"name"`
 	Dockerfile string `yaml:"dockerfile"`

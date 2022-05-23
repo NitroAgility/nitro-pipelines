@@ -39,6 +39,7 @@ type PromotionContext struct {
 	PostPromotion	string
 	Expand			[]PromotionExpandContext
 	Images			[]PromotionImageContext
+	Strategy		string
 }
 
 // Creational functions
@@ -56,6 +57,13 @@ func NewPromotionContext(microservicesFile string, name string)  (*PromotionCont
 	if len(envSource) == 0 {
 		envSource = "BUILD"
 	}
+	strategy := "push"
+	env := strings.ToLower(envTarget)
+	if val, ok := msModel.Settings.Environment[env]; ok {
+		if strings.ToLower(val.PromotionStrategy) == "retag" {
+			strategy = "retag"
+		}
+	}
 	context := &PromotionContext {
 		Name			: name,
 		Environment 	: strings.ToLower(os.Getenv("ENV_TARGET")),
@@ -65,6 +73,7 @@ func NewPromotionContext(microservicesFile string, name string)  (*PromotionCont
 		PostPromotion	: buildScript(msModel.Deployments.Default.Scripts.PostPromotion),
 		Expand			: []PromotionExpandContext{},
 		Images			: []PromotionImageContext{},
+		Strategy		: strategy,
 	}
 	for _, e := range msModel.Deployments.Default.Expand {
 		expCtx := PromotionExpandContext {}
