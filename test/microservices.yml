@@ -8,9 +8,9 @@ settings:
     prod:
       promotion_strategy: 'push'
 microservices:
-  - name: p24-next-telegram-bot
+  - name: sampletelegram-bot
     dockerfile: ./microservices/nitro_pipelines_app1/Dockerfile
-  - name: p24-next-platform-api
+  - name: sampleplatform-api
     dockerfile: ./microservices/nitro_pipelines_app2/api/Dockerfile
 build:
   build_args: ''
