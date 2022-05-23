@@ -8,9 +8,9 @@ settings:
     prod:
       promotion_strategy: 'push'
 microservices:
-  - name: sampletelegram-bot
+  - name: sample-telegram-bot
     dockerfile: ./microservices/nitro_pipelines_app1/Dockerfile
-  - name: sampleplatform-api
+  - name: sample-platform-api
     dockerfile: ./microservices/nitro_pipelines_app2/api/Dockerfile
 build:
   build_args: ''
