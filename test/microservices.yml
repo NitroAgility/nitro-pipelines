@@ -2,7 +2,7 @@
 settings:
   environments:
     dev:
-      promotion_strategy: 'retag'
+      promotion_strategy: 'push'
     uat:
       promotion_strategy: 'retag'
     prod:
