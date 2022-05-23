@@ -376,4 +376,5 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/python,go,visualstudiocode,intellij+all,linux,osx,windows
 
 # Project Files
+nitro
 ./nitro
