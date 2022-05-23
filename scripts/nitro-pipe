@@ -1,5 +1,6 @@
 #!/bin/bash
 export NITROBIN=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+if [ "$NITROBIN" != "/" ]; then export NITROBIN="$NITROBIN/"; fi
 if [ "$(uname)" == "Darwin" ]; then
     export MACHINE_OS="OSX"
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
@@ -11,15 +12,15 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
 fi
 filename=$(uuidgen)
 if [ $MACHINE_OS == "OSX" ]; then
-    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 --decode > $NITROBIN/$filename.tmp && envsubst < $NITROBIN/$filename.tmp > $NITROBIN/$filename.env && rm $NITROBIN/$filename.tmp
+    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 --decode > "$NITROBIN/"$filename.tmp && envsubst < "$NITROBIN/"$filename.tmp > "$NITROBIN/"$filename.env && rm "$NITROBIN/"$filename.tmp
 else
-    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 -di > $NITROBIN/$filename.tmp && envsubst < $NITROBIN/$filename.tmp > $NITROBIN/$filename.env && rm $NITROBIN/$filename.tmp
+    echo $NITRO_PIPELINES_GLOBAL_VARIABLES_BASE64 | base64 -di > "$NITROBIN/"$filename.tmp && envsubst < "$NITROBIN/"$filename.tmp > "$NITROBIN/"$filename.env && rm "$NITROBIN/"$filename.tmp
 fi
-if [ -s $NITROBIN/$filename.env  ]; then
-	source $NITROBIN/$filename.env && export $(cut -d= -f1 $NITROBIN/$filename.env)
-    rm -f $NITROBIN/$filename.env
+if [ -s "$NITROBIN/"$filename.env  ]; then
+	source "$NITROBIN/"$filename.env && export $(cut -d= -f1 "$NITROBIN/"$filename.env)
+    rm -f "$NITROBIN/"$filename.env
 else
-	echo "File $NITROBIN/$filename.env is empty"
+	echo "File "$NITROBIN/"$filename.env is empty"
     exit 1
 fi
 if [ -z "$1" ]; then
@@ -27,14 +28,14 @@ if [ -z "$1" ]; then
     exit 1
 fi
 cwd=$(dirname "$0")
-$NITROBIN/nitro $1 $2
+"$NITROBIN/"nitro $1 $2
 if [[ $? -ne 0 ]]; then exit 1;fi
 if [ $1 = "build" ]; then
     if [ -z "$2" ]; then
         echo "No required arguments supplied (operation=any|build|promote|deploy, ms_name)."
         exit
     else
-        declare script_name="$NITROBIN/nitro-$2-build.sh"
+        declare script_name=""$NITROBIN/"nitro-$2-build.sh"
         if test -f $script_name; then
             source $script_name
         else
@@ -47,7 +48,7 @@ elif [ $1 = "promote" ]; then
         echo "No required arguments supplied (operation=any|build|promote|deploy, ms_name)."
         exit
     else
-        declare script_name="$NITROBIN/nitro-$2-promote.sh"
+        declare script_name=""$NITROBIN/"nitro-$2-promote.sh"
         if test -f $script_name; then
             source $script_name
         else
@@ -56,7 +57,7 @@ elif [ $1 = "promote" ]; then
         fi
     fi
 else
-    script_name="$NITROBIN/nitro-deploy.sh"
+    script_name=""$NITROBIN/"nitro-deploy.sh"
     if test -f $script_name; then
         source $script_name
     else
