@@ -1,22 +1,20 @@
 pipeline {
     agent any
     options { disableConcurrentBuilds() }
-    environment {
-        NITRO_PIPELINES_DEV_GITHUB_USERNAME = credentials('jenkins/nitro/dev/docker-hub/username')
-        NITRO_PIPELINES_DEV_GITHUB_PASSWORD = credentials('jenkins/nitro/dev/docker-hub/password')
-    }
     stages {
         stage('Build') {
             steps {
-                sh 'docker build -t nitroagility/nitro-bitbucket-pipelines:$BUILD_NUMBER -f ./bitbucket/Dockerfile .'
+                sh 'docker build -t nitroagility/nitro-bitbucket-pipelines:2.$BUILD_NUMBER -f ./bitbucket/Dockerfile .'
             }
         }
         stage('Deploy') {
             environment {
+                NITRO_PIPELINES_DEV_GITHUB_USERNAME = credentials('jenkins/nitro/dev/docker-hub/username')
+                NITRO_PIPELINES_DEV_GITHUB_PASSWORD = credentials('jenkins/nitro/dev/docker-hub/password')
             }
             steps {
                 sh 'echo "$NITRO_PIPELINES_DEV_GITHUB_PASSWORD" | docker login --username "$NITRO_PIPELINES_DEV_GITHUB_USERNAME" --password-stdin'
-                sh 'docker push nitroagility/nitro-bitbucket-pipelines:$BUILD_NUMBER'
+                sh 'docker push nitroagility/nitro-bitbucket-pipelines:2.$BUILD_NUMBER'
             }
         }
     }
