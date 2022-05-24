@@ -26,11 +26,12 @@ type BuildExpandContext struct {
 }
 
 type BuildContext struct {
-	Name		string
-	Expand		[]BuildExpandContext
-	Dockerfile 	string
-	DockerArgs 	string
-	ImageName	string
+	Name		 string
+	Expand		 []BuildExpandContext
+	Dockerfile 	 string
+	DockerArgs 	 string
+	ImageName	 string
+	ImageTagName string
 }
 
 // Creational functions
@@ -52,9 +53,13 @@ func NewBuildContext(microservicesFile string, msName string) (*BuildContext, er
 		return nil, errors.New("invalid microservice name")
 	}
 	repoIncludeEnv := true
+	tagIncludeEnv := true
 	if val, ok := msModel.Settings.Environment["build"]; ok {
-		if strings.ToLower(val.RepoStrategoy) == "base" {
+		if strings.ToLower(val.RepoStrategoy) == "no-env" {
 			repoIncludeEnv = false
+		}
+		if strings.ToLower(val.TagStrategoy) == "no-env" {
+			tagIncludeEnv = false
 		}
 	}
 	context := &BuildContext {
@@ -62,6 +67,7 @@ func NewBuildContext(microservicesFile string, msName string) (*BuildContext, er
 		Dockerfile	: microservice.Dockerfile,
 		DockerArgs	: msModel.Build.BuildArgs,
 		ImageName	: buildImageName(microservice.Name, "", repoIncludeEnv),
+		ImageTagName: buildImageTagName("", tagIncludeEnv),
 	}
 	for _, e := range msModel.Build.Expand {
 		expCtx := BuildExpandContext {}

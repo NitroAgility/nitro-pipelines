@@ -14,6 +14,7 @@
             "env": {
                 "ENV": "DEV",
                 "ENV_TARGET": "DEV",
+                "NITRO_PIPELINES_BUILD_NUMBER": "83",
                 "NITRO_PIPELINES_MICROSERVICES_PATH": "./test/microservices.yml",
                 "DRY_RUN": "false",
             }

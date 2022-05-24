@@ -14,6 +14,7 @@ package contexts
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -41,4 +42,15 @@ func buildImageName(imageName string, env string, repoIncludeEnv bool) string {
 		return strings.ToLower(fmt.Sprintf("build-%s", imageName))
 	}
 	return strings.ToLower(fmt.Sprintf("%s-%s", env, imageName))
+}
+
+func buildImageTagName(env string, tagIncludeEnv bool) string {
+	tag := os.Getenv("NITRO_PIPELINES_BUILD_NUMBER")
+	if !tagIncludeEnv {
+		return tag
+	}
+	if len(env) == 0 {
+		return strings.ToLower(fmt.Sprintf("build-%s", tag))
+	}
+	return strings.ToLower(fmt.Sprintf("%s-%s", env, tag))
 }

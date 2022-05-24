@@ -24,6 +24,7 @@ type Setting struct {
 
 type EnvironemntSetting struct {
 	RepoStrategoy	string `yaml:"repo_strategy"`
+	TagStrategoy	string `yaml:"tag_strategy"`
 	PromotionStrategy	string `yaml:"promotion_strategy"`
 }
 

@@ -66,9 +66,9 @@ docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGI
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:latest
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+docker tag {{ .ImageName }}:latest $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:{{ .ImageTagName }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:$NITRO_PIPELINES_BUILD_NUMBER
+docker push $NITRO_PIPELINES_VARIABLES_TARGET_DOCKER_REGISTRY/{{ .ImageName }}:{{ .ImageTagName }}
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 rm -f ./aws_config
 rm -f ./aws_credentials

@@ -25,9 +25,11 @@ type PromotionExpandContext struct {
 }
 
 type PromotionImageContext struct {
-	Name			string
-	SourceImageName string
-	TargetImageName	string
+	Name				string
+	SourceImageName 	string
+	SourceImageTagName 	string
+	TargetImageName		string
+	TargetImageTagName 	string
 }
 
 type PromotionContext struct {
@@ -51,21 +53,25 @@ func NewPromotionContext(microservicesFile string, name string)  (*PromotionCont
 	}
 	envSource := strings.ToUpper(os.Getenv("ENV_SOURCE"))
 	envTarget := strings.ToUpper(os.Getenv("ENV_TARGET"))
-	if len(envTarget) == 0 {
-		return nil, errors.New("target environment cannot be null")
+	if len(envTarget) == 0 || envTarget == "BUILD" {
+		return nil, errors.New("target environment cannot be either null or equal to build")
 	}
 	if len(envSource) == 0 {
 		envSource = "BUILD"
 	}
 	repoIncludeEnv := true
+	tagIncludeEnv := true
 	strategy := "push"
 	env := strings.ToLower(envTarget)
 	if val, ok := msModel.Settings.Environment[env]; ok {
 		if strings.ToLower(val.PromotionStrategy) == "retag" {
 			strategy = "retag"
 		}
-		if strings.ToLower(val.RepoStrategoy) == "base" {
+		if strings.ToLower(val.RepoStrategoy) == "no-env" {
 			repoIncludeEnv = false
+		}
+		if strings.ToLower(val.TagStrategoy) == "no-env" {
+			tagIncludeEnv = false
 		}
 	}
 	context := &PromotionContext {
@@ -89,10 +95,12 @@ func NewPromotionContext(microservicesFile string, name string)  (*PromotionCont
 	for _, m := range msModel.Microservices {
 		if name == "" || m.Name == name {
 			msCtx := PromotionImageContext {}
-			msCtx.Name				= m.Name
-			msCtx.SourceImageName 	= buildImageName(m.Name, envSource, repoIncludeEnv)
-			msCtx.TargetImageName 	= buildImageName(m.Name, envTarget, repoIncludeEnv)
-			context.Images			= append(context.Images, msCtx)
+			msCtx.Name				 = m.Name
+			msCtx.SourceImageName 	 = buildImageName(m.Name, envSource, repoIncludeEnv)
+			msCtx.SourceImageTagName = buildImageTagName(envSource, tagIncludeEnv)
+			msCtx.TargetImageName 	 = buildImageName(m.Name, envTarget, repoIncludeEnv)
+			msCtx.TargetImageTagName = buildImageTagName(envTarget, tagIncludeEnv)
+			context.Images			 = append(context.Images, msCtx)
 		}
 	}
 	return context, nil
