@@ -2,18 +2,18 @@
 settings:
   environments:
     build:
-      tag_strategy: 'no-env'
+      tag_strategy: 'env'
       repo_strategy:  'no-env'
     dev:
-      tag_strategy: 'no-env'
+      tag_strategy: 'env'
       repo_strategy:  'no-env'
       promotion_strategy: 'retag'
     uat:
-      tag_strategy: 'no-env'
+      tag_strategy: 'env'
       repo_strategy:  'no-env'
       promotion_strategy: 'retag'
     prod:
-      tag_strategy: 'no-env'
+      tag_strategy: 'env'
       repo_strategy:  'no-env'
       promotion_strategy: 'push'
 microservices:
