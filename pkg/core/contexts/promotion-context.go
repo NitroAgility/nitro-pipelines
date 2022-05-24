@@ -57,11 +57,15 @@ func NewPromotionContext(microservicesFile string, name string)  (*PromotionCont
 	if len(envSource) == 0 {
 		envSource = "BUILD"
 	}
+	repoIncludeEnv := true
 	strategy := "push"
 	env := strings.ToLower(envTarget)
 	if val, ok := msModel.Settings.Environment[env]; ok {
 		if strings.ToLower(val.PromotionStrategy) == "retag" {
 			strategy = "retag"
+		}
+		if strings.ToLower(val.RepoStrategoy) == "base" {
+			repoIncludeEnv = false
 		}
 	}
 	context := &PromotionContext {
@@ -86,8 +90,8 @@ func NewPromotionContext(microservicesFile string, name string)  (*PromotionCont
 		if name == "" || m.Name == name {
 			msCtx := PromotionImageContext {}
 			msCtx.Name				= m.Name
-			msCtx.SourceImageName 	= buildImageName(m.Name, envSource)
-			msCtx.TargetImageName 	= buildImageName(m.Name, envTarget)
+			msCtx.SourceImageName 	= buildImageName(m.Name, envSource, repoIncludeEnv)
+			msCtx.TargetImageName 	= buildImageName(m.Name, envTarget, repoIncludeEnv)
 			context.Images			= append(context.Images, msCtx)
 		}
 	}

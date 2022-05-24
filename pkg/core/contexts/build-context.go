@@ -14,7 +14,7 @@ package contexts
 
 import (
 	"errors"
-	"fmt"
+	"strings"
 
 	"github.com/NitroAgility/nitro-pipelines/pkg/core/models"
 )
@@ -51,11 +51,17 @@ func NewBuildContext(microservicesFile string, msName string) (*BuildContext, er
 	if !exists {
 		return nil, errors.New("invalid microservice name")
 	}
+	repoIncludeEnv := true
+	if val, ok := msModel.Settings.Environment["build"]; ok {
+		if strings.ToLower(val.RepoStrategoy) == "base" {
+			repoIncludeEnv = false
+		}
+	}
 	context := &BuildContext {
 		Name		: microservice.Name,
 		Dockerfile	: microservice.Dockerfile,
 		DockerArgs	: msModel.Build.BuildArgs,
-		ImageName	: fmt.Sprintf("build-%s", microservice.Name),
+		ImageName	: buildImageName(microservice.Name, "", repoIncludeEnv),
 	}
 	for _, e := range msModel.Build.Expand {
 		expCtx := BuildExpandContext {}

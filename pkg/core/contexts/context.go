@@ -33,8 +33,8 @@ func buildFileName(fileName string) string {
 	return  uuid.New().String()
 }
 
-func buildImageName(imageName string, env string) string {
-	if len(imageName) == 0 {
+func buildImageName(imageName string, env string, repoIncludeEnv bool) string {
+	if len(imageName) == 0 || !repoIncludeEnv {
 		return imageName
 	}
 	if len(env) == 0 {

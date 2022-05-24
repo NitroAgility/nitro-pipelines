@@ -1,11 +1,16 @@
 # applicative microservices
 settings:
   environments:
+    build:
+      repo_strategy: 'base'
     dev:
+      repo_strategy: 'base'
       promotion_strategy: 'retag'
     uat:
+      repo_strategy: 'base'
       promotion_strategy: 'retag'
     prod:
+      repo_strategy: 'base'
       promotion_strategy: 'push'
 microservices:
   - name: sample-app1
