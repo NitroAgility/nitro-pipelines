@@ -7,11 +7,11 @@ settings:
     dev:
       repo_strategy:  'no-env'
       tag_strategy: 'env'
-      promotion_strategy: 'retag'
+      promotion_strategy: 'push'
     uat:
       repo_strategy:  'no-env'
       tag_strategy: 'env'
-      promotion_strategy: 'retag'
+      promotion_strategy: 'push'
     prod:
       repo_strategy:  'no-env'
       tag_strategy: 'env'
