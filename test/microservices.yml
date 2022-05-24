@@ -2,19 +2,19 @@
 settings:
   environments:
     build:
-      tag_strategy: 'env'
       repo_strategy:  'no-env'
+      tag_strategy: 'env'
     dev:
-      tag_strategy: 'env'
       repo_strategy:  'no-env'
+      tag_strategy: 'env'
       promotion_strategy: 'retag'
     uat:
-      tag_strategy: 'env'
       repo_strategy:  'no-env'
+      tag_strategy: 'env'
       promotion_strategy: 'retag'
     prod:
-      tag_strategy: 'env'
       repo_strategy:  'no-env'
+      tag_strategy: 'env'
       promotion_strategy: 'push'
 microservices:
   - name: sample-app1
