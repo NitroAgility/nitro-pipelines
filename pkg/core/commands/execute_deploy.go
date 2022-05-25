@@ -48,9 +48,9 @@ exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 {{ end -}}
 {{ end -}}
 # Environment configuration
-aws configure set aws_access_key_id $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_ACCESS_KEY
+aws configure set aws_access_key_id $NITRO_PIPELINES_VARIABLES_TARGET_AWS_ACCESS_KEY
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
-aws configure set aws_secret_access_key $NITRO_PIPELINES_VARIABLES_SOURCE_AWS_SECRET_ACCESS
+aws configure set aws_secret_access_key $NITRO_PIPELINES_VARIABLES_TARGET_AWS_SECRET_ACCESS
 exit_code=$? && if [ $exit_code -ne 0 ]; then exit $exit_code; fi
 # EKS Deployment
 aws eks --region $NITRO_PIPELINES_VARIABLES_TARGET_AWS_REGION update-kubeconfig --name $NITRO_PIPELINES_VARIABLES_TARGET_AWS_EKS_CLUSTER_NAME
